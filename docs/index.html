@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root { --bg-dark: #05070e; --sidebar: #0a0e17; --accent: #00ffcc; --text-main: #e2e8f0; --text-sub: #94a3b8; }
+    :root { --bg-dark: transparent; --sidebar: #0a0e17; --accent: #00ffcc; --text-main: #e2e8f0; --text-sub: #94a3b8; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
     
@@ -34,9 +34,22 @@
     .content ul { margin-bottom: 20px; padding-left: 20px; }
     .content li { margin-bottom: 10px; color: var(--text-sub); }
     .content .alert { background: rgba(157, 78, 221, 0.1); border-left: 4px solid #9d4edd; padding: 20px; border-radius: 0 8px 8px 0; margin: 30px 0; }
+      /* FONDO ESTELAR CSS ANIMADO PARA DOCS */
+    @keyframes move-twink-back { from {background-position:0 0;} to {background-position:-10000px 5000px;} }
+    .stars, .twinkling { position:fixed; top:0; left:0; width:100vw; height:100vh; display:block; z-index:-2; pointer-events:none; }
+    .stars { background: #020307 url(https://raw.githubusercontent.com/front-end-space/space-background-css/master/images/stars.png) repeat top center; z-index:-3; }
+    .twinkling { background:transparent url(https://raw.githubusercontent.com/front-end-space/space-background-css/master/images/twinkling.png) repeat top center; z-index:-2; animation:move-twink-back 200s linear infinite; opacity: 0.3; }
+
+    /* ESTILOS MEJORADOS */
+    .sidebar { background: rgba(10, 14, 22, 0.7); backdrop-filter: blur(15px); border-right: 1px solid rgba(0,255,204,0.1); }
+    .content h1 { text-shadow: 0 0 20px rgba(255,255,255,0.2); }
+    .content h2 { text-shadow: 0 0 10px rgba(0,255,204,0.3); border-bottom: 1px solid rgba(0,255,204,0.2); }
+    .content .alert { background: rgba(157, 78, 221, 0.05); border-left: 4px solid var(--accent-purple); box-shadow: 0 0 20px rgba(157, 78, 221, 0.1); backdrop-filter: blur(10px); }
+    .sidebar a.active { background: linear-gradient(90deg, rgba(0,255,204,0.15), transparent); border-left: 3px solid var(--accent); color: var(--accent); text-shadow: 0 0 10px rgba(0,255,204,0.5); }
   </style>
 </head>
 <body>
+  <div class='stars'></div><div class='twinkling'></div>
 
   <nav class="navbar">
     <a href="../index.html" class="navbar-brand">NEBULA<span>OS</span></a>
@@ -119,3 +132,4 @@
   </script>
 </body>
 </html>
+

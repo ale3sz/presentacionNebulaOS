@@ -6,96 +6,217 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     :root {
-      --bg-dark: #05070e;
+      --bg-dark: #020307;
       --accent: #00ffcc;
-      --accent-glow: rgba(0, 255, 204, 0.6);
+      --accent-glow: rgba(0, 255, 204, 0.8);
       --accent-purple: #9d4edd;
-      --text-main: #e2e8f0;
-      --text-sub: #94a3b8;
+      --accent-purple-glow: rgba(157, 78, 221, 0.8);
+      --text-main: #f8fafc;
+      --text-sub: #cbd5e1;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); overflow-x: hidden; }
     
+    /* 3D BACKGROUND */
+    #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; }
+    .vignette { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, transparent 0%, #020307 100%); z-index: -1; pointer-events: none; }
+
     /* NAVBAR GLOBAL */
-    .navbar { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(5, 7, 14, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 8vw; z-index: 1000; }
-    .navbar-brand { color: #fff; font-size: 1.5em; font-weight: 700; text-decoration: none; font-family: 'Space Grotesk', sans-serif; letter-spacing: 1px; }
-    .navbar-brand span { color: var(--accent); }
-    .nav-links { display: flex; gap: 30px; align-items: center; }
-    .nav-link { color: var(--text-main); text-decoration: none; font-weight: 500; font-size: 0.95em; transition: 0.3s; }
-    .nav-link:hover { color: var(--accent); }
-    .nav-btn { background: rgba(0, 255, 204, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: 0.3s; }
-    .nav-btn:hover { background: var(--accent); color: var(--bg-dark); box-shadow: 0 0 15px var(--accent-glow); }
+    .navbar { position: fixed; top: 0; width: 100%; height: 75px; background: rgba(2, 3, 7, 0.6); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-bottom: 1px solid rgba(0,255,204,0.1); display: flex; align-items: center; justify-content: space-between; padding: 0 8vw; z-index: 1000; transition: 0.4s; }
+    .navbar:hover { background: rgba(2, 3, 7, 0.8); border-bottom: 1px solid rgba(0,255,204,0.3); box-shadow: 0 10px 30px rgba(0,255,204,0.05); }
+    .navbar-brand { color: #fff; font-size: 1.8em; font-weight: 700; text-decoration: none; font-family: 'Space Grotesk', sans-serif; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+    .navbar-brand span { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
+    .nav-links { display: flex; gap: 35px; align-items: center; }
+    .nav-link { color: var(--text-main); text-decoration: none; font-weight: 500; font-size: 1em; transition: 0.3s; position: relative; }
+    .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background: var(--accent); transition: 0.3s; box-shadow: 0 0 10px var(--accent-glow); }
+    .nav-link:hover::after { width: 100%; }
+    .nav-link:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+    
+    .nav-btn { background: linear-gradient(45deg, rgba(0,255,204,0.1), rgba(157,78,221,0.1)); border: 1px solid var(--accent); color: var(--accent); padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: 0.4s; position: relative; overflow: hidden; }
+    .nav-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,255,204,0.4), transparent); transition: 0.5s; }
+    .nav-btn:hover::before { left: 100%; }
+    .nav-btn:hover { background: var(--accent); color: var(--bg-dark); box-shadow: 0 0 25px var(--accent-glow); transform: scale(1.05); }
 
     /* HERO SECTION */
-    .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; overflow: hidden; }
-    .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1a1f2e 0%, #05070e 100%); z-index: 0; }
-    .hero-content { position: relative; z-index: 1; max-width: 900px; animation: fadeUp 1s ease-out; }
-    .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 5vw; font-weight: 700; margin-bottom: 20px; line-height: 1.1; background: linear-gradient(180deg, #fff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .hero p { font-size: 1.3em; color: var(--text-sub); margin-bottom: 40px; line-height: 1.6; }
-    .hero-buttons { display: flex; gap: 20px; justify-content: center; }
-    .btn-primary { background: var(--accent); color: var(--bg-dark); padding: 15px 35px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 1.1em; transition: 0.3s; box-shadow: 0 0 20px var(--accent-glow); }
-    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 30px var(--accent-glow); }
-    .btn-secondary { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 15px 35px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.1em; transition: 0.3s; backdrop-filter: blur(10px); }
-    .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+    .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; z-index: 1; }
+    .hero-content { position: relative; max-width: 1000px; animation: slideUpFade 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+    .badge { display: inline-block; padding: 8px 16px; background: rgba(157, 78, 221, 0.15); border: 1px solid var(--accent-purple); color: #d8b4fe; border-radius: 30px; font-size: 0.9em; font-weight: 600; margin-bottom: 30px; letter-spacing: 1px; box-shadow: 0 0 15px rgba(157, 78, 221, 0.3); backdrop-filter: blur(5px); }
+    .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 6vw; font-weight: 700; margin-bottom: 25px; line-height: 1.1; color: #fff; text-shadow: 0 0 40px rgba(255,255,255,0.2); }
+    .hero h1 .highlight { background: linear-gradient(to right, var(--accent), #5eead4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(0,255,204,0.4)); }
+    .hero p { font-size: 1.4em; color: var(--text-sub); margin-bottom: 50px; line-height: 1.6; max-width: 800px; margin-left: auto; margin-right: auto; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+    
+    .hero-buttons { display: flex; gap: 25px; justify-content: center; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, #0d9488 100%); color: var(--bg-dark); padding: 18px 45px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 1.2em; transition: 0.4s; box-shadow: 0 10px 30px rgba(0,255,204,0.3); border: 1px solid rgba(255,255,255,0.5); }
+    .btn-primary:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 40px rgba(0,255,204,0.6); }
+    .btn-secondary { background: rgba(10, 14, 22, 0.5); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 18px 45px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 1.2em; transition: 0.4s; backdrop-filter: blur(15px); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: var(--text-main); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
     /* CARDS SECTION */
-    .features { padding: 100px 8vw; background: var(--bg-dark); position: relative; z-index: 1; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-    .card { background: rgba(13, 17, 28, 0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 40px; transition: 0.4s; backdrop-filter: blur(20px); text-decoration: none; color: inherit; display: block; }
-    .card:hover { transform: translateY(-10px); border-color: rgba(157, 78, 221, 0.4); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-    .card i { font-size: 2.5em; color: var(--accent-purple); margin-bottom: 20px; }
-    .card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.5em; margin-bottom: 15px; color: #fff; }
-    .card p { color: var(--text-sub); line-height: 1.6; }
+    .features { padding: 120px 8vw; position: relative; z-index: 1; }
+    .section-title { text-align: center; font-family: 'Space Grotesk', sans-serif; font-size: 3em; margin-bottom: 80px; color: #fff; }
+    .section-title span { color: var(--accent-purple); text-shadow: 0 0 20px var(--accent-purple-glow); }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; }
+    .card { background: rgba(10, 12, 20, 0.4); border: 1px solid rgba(0,255,204,0.1); border-radius: 24px; padding: 50px 40px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); text-decoration: none; color: inherit; display: block; position: relative; overflow: hidden; }
+    .card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(0,255,204,0.1) 0%, transparent 60%); opacity: 0; transition: 0.5s; pointer-events: none; }
+    .card:hover::before { opacity: 1; }
+    .card:hover { transform: translateY(-15px); border-color: var(--accent); box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 30px rgba(0,255,204,0.2); }
+    
+    .card-icon-wrap { width: 80px; height: 80px; border-radius: 20px; background: rgba(157, 78, 221, 0.1); border: 1px solid rgba(157, 78, 221, 0.3); display: flex; justify-content: center; align-items: center; margin-bottom: 30px; transition: 0.4s; }
+    .card:hover .card-icon-wrap { background: rgba(0, 255, 204, 0.15); border-color: var(--accent); box-shadow: 0 0 20px rgba(0,255,204,0.4); transform: scale(1.1) rotate(5deg); }
+    .card i { font-size: 2.5em; color: var(--accent-purple); transition: 0.4s; }
+    .card:hover i { color: var(--accent); }
+    
+    .card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.8em; margin-bottom: 15px; color: #fff; }
+    .card p { color: var(--text-sub); line-height: 1.7; font-size: 1.1em; }
 
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(50px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
   </style>
 </head>
 <body>
 
+  <!-- BACKGROUND 3D GALAXY -->
+  <canvas id="webgl-canvas"></canvas>
+  <div class="vignette"></div>
+
   <nav class="navbar">
-    <a href="index.html" class="navbar-brand">NEBULA<span>OS</span></a>
+    <a href="index.html" class="navbar-brand">NEBULA<span style="color: var(--accent);">OS</span></a>
     <div class="nav-links">
-      <a href="index.html" class="nav-link" style="color: var(--accent);">Inicio</a>
+      <a href="index.html" class="nav-link" style="color: var(--accent); text-shadow: 0 0 10px var(--accent-glow);">Inicio</a>
       <a href="docs/index.html" class="nav-link">Documentación</a>
-      <a href="manual/index.html" class="nav-link">Manual de Usuario</a>
-      <a href="exposicion/index.html" class="nav-link">Exposición</a>
+      <a href="manual/index.html" class="nav-link">Manual Interactivo</a>
+      <a href="exposicion/index.html" class="nav-link">Exposición 3D</a>
       <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="nav-btn"><i class="fa-solid fa-download"></i> Descargar OS</a>
     </div>
   </nav>
 
   <section class="hero">
-    <div class="hero-bg"></div>
     <div class="hero-content">
-      <h1>Explora nuevos límites.</h1>
-      <p>Un ecosistema basado en Linux diseñado desde cero por programadores y gamers. Optimizado para alto rendimiento, máxima seguridad y personalización sin límites. Sin telemetría, sin restricciones.</p>
+      <div class="badge"><i class="fa-solid fa-rocket"></i> Versión 2.5 Ultimate Disponible</div>
+      <h1>Explora <span class="highlight">nuevos límites.</span></h1>
+      <p>Un ecosistema basado en Linux diseñado desde cero por programadores y gamers. Optimizado para alto rendimiento, máxima seguridad y personalización hiperespacial. Sin telemetría, sin restricciones.</p>
       <div class="hero-buttons">
-        <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="btn-primary"><i class="fa-solid fa-download"></i> Descargar v2.5</a>
+        <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="btn-primary"><i class="fa-solid fa-download"></i> Descargar Ahora</a>
         <a href="exposicion/index.html" class="btn-secondary"><i class="fa-solid fa-play"></i> Ver Presentación</a>
       </div>
     </div>
   </section>
 
   <section class="features">
+    <h2 class="section-title">El Universo <span>Nebula</span></h2>
     <div class="grid">
       <a href="docs/index.html" class="card">
-        <i class="fa-solid fa-book"></i>
+        <div class="card-icon-wrap"><i class="fa-solid fa-book"></i></div>
         <h3>Documentación</h3>
         <p>Aprende sobre la arquitectura del sistema, los requisitos de hardware, el proceso de instalación y nuestra filosofía de código abierto.</p>
       </a>
       <a href="manual/index.html" class="card">
-        <i class="fa-solid fa-hand-pointer"></i>
+        <div class="card-icon-wrap"><i class="fa-solid fa-hand-pointer"></i></div>
         <h3>Manual Interactivo</h3>
         <p>Explora la interfaz gráfica del sistema a través de un manual visual. Descubre Nebula Shield, el Gaming HUD y el control de personalización.</p>
       </a>
       <a href="exposicion/index.html" class="card">
-        <i class="fa-solid fa-vr-cardboard"></i>
+        <div class="card-icon-wrap"><i class="fa-solid fa-vr-cardboard"></i></div>
         <h3>Exposición 3D</h3>
-        <p>Una experiencia de diapositivas hiperespacial diseñada para defender el proyecto en vivo con animaciones WebGL.</p>
+        <p>Una experiencia de diapositivas hiperespacial diseñada para defender el proyecto en vivo. Creado con animaciones WebGL y efectos Parallax.</p>
       </a>
     </div>
   </section>
 
+  <script>
+    // --- THREE.JS GALAXY BACKGROUND ---
+    const canvas = document.getElementById('webgl-canvas');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Generar Galaxia Espiral
+    const parameters = { count: 8000, size: 0.015, radius: 20, branches: 4, spin: 1, randomness: 0.5, randomnessPower: 3, insideColor: '#00ffcc', outsideColor: '#9d4edd' };
+    
+    let geometry = null;
+    let material = null;
+    let points = null;
+
+    const generateGalaxy = () => {
+      geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(parameters.count * 3);
+      const colors = new Float32Array(parameters.count * 3);
+
+      const colorInside = new THREE.Color(parameters.insideColor);
+      const colorOutside = new THREE.Color(parameters.outsideColor);
+
+      for(let i = 0; i < parameters.count; i++) {
+        const i3 = i * 3;
+        const radius = Math.random() * parameters.radius;
+        const spinAngle = radius * parameters.spin;
+        const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
+        
+        const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+        const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+        const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+
+        positions[i3    ] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+        positions[i3 + 1] = randomY;
+        positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+        const mixedColor = colorInside.clone();
+        mixedColor.lerp(colorOutside, radius / parameters.radius);
+
+        colors[i3    ] = mixedColor.r;
+        colors[i3 + 1] = mixedColor.g;
+        colors[i3 + 2] = mixedColor.b;
+      }
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      material = new THREE.PointsMaterial({ size: parameters.size, depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true });
+      points = new THREE.Points(geometry, material);
+      scene.add(points);
+    };
+
+    generateGalaxy();
+    
+    camera.position.x = 0;
+    camera.position.y = 10;
+    camera.position.z = 15;
+    camera.lookAt(scene.position);
+
+    // Mouse interaciton
+    let mouseX = 0;
+    let mouseY = 0;
+    window.addEventListener('mousemove', (e) => {
+      mouseX = (e.clientX / window.innerWidth) - 0.5;
+      mouseY = (e.clientY / window.innerHeight) - 0.5;
+    });
+
+    const clock = new THREE.Clock();
+    const tick = () => {
+      const elapsedTime = clock.getElapsedTime();
+      
+      // Rotar galaxia
+      points.rotation.y = elapsedTime * 0.05;
+      
+      // Parallax sutil
+      camera.position.x += (mouseX * 5 - camera.position.x) * 0.05;
+      camera.position.y += (10 + -mouseY * 5 - camera.position.y) * 0.05;
+      camera.lookAt(scene.position);
+
+      renderer.render(scene, camera);
+      window.requestAnimationFrame(tick);
+    };
+    tick();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
 </body>
 </html>

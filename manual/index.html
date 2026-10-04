@@ -81,6 +81,15 @@
     .global-nav-link { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: 0.3s; }
     .global-nav-link:hover { color: var(--accent); }
     .global-nav-btn { background: rgba(0, 255, 204, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; }
+      /* FONDO ESTELAR CSS ANIMADO PARA MANUAL */
+    @keyframes move-twink-back { from {background-position:0 0;} to {background-position:-10000px 5000px;} }
+    .stars, .twinkling { position:fixed; top:0; left:0; width:100vw; height:100vh; display:block; z-index:-2; pointer-events:none; }
+    .stars { background: #020307 url(https://raw.githubusercontent.com/front-end-space/space-background-css/master/images/stars.png) repeat top center; z-index:-3; }
+    .twinkling { background:transparent url(https://raw.githubusercontent.com/front-end-space/space-background-css/master/images/twinkling.png) repeat top center; z-index:-2; animation:move-twink-back 200s linear infinite; opacity: 0.3; }
+    
+    .main-content { background: transparent; }
+    .view-container { border: 1px solid rgba(0,255,204,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(0,255,204,0.1); }
+    .tooltip { border: 1px solid var(--accent); box-shadow: 0 0 20px rgba(0,255,204,0.2); }
   </style>
 </head>
 <body>
@@ -94,6 +103,7 @@
       <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="global-nav-btn"><i class="fa-solid fa-download"></i> Descargar OS</a>
     </div>
   </nav>
+  <div class='stars'></div><div class='twinkling'></div>
   <div style="display: flex; flex: 1; overflow: hidden;">
 
   <!-- SIDEBAR NAVEGACIÃ“N -->
@@ -294,4 +304,5 @@
   </div>
 </body>
 </html>
+
 
