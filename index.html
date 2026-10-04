@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="icon" type="image/png" href="assets/nebulaLogo.png">
   <style>
     :root {
       --bg-dark: #020307;
@@ -18,8 +19,41 @@
       --text-sub: #cbd5e1;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); overflow-x: hidden; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); overflow-x: hidden; cursor: none; }
     
+    /* CUSTOM CURSOR */
+    .cursor-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000; box-shadow: 0 0 10px var(--accent); transform: translate(-50%, -50%); }
+    .cursor-outline { width: 40px; height: 40px; border: 1px solid var(--accent-glow); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s; }
+    a:hover ~ .cursor-outline, button:hover ~ .cursor-outline { width: 60px; height: 60px; background: rgba(0, 255, 204, 0.1); }
+
+    /* BOOT SEQUENCE */
+    #boot-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 20000; display: flex; flex-direction: column; padding: 20px; font-family: monospace; color: #00ffcc; font-size: 14px; overflow: hidden; transition: opacity 0.8s ease; }
+    .boot-line { margin: 2px 0; opacity: 0; text-shadow: 0 0 5px rgba(0,255,204,0.5); }
+    #boot-logo-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0; transition: opacity 1s ease; }
+    #boot-logo-container img { width: 150px; filter: drop-shadow(0 0 20px var(--accent)); }
+
+    /* NOVA AI WIDGET */
+    .nova-orb { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: rgba(10, 14, 22, 0.8); box-shadow: 0 0 30px var(--accent-glow); z-index: 1000; cursor: pointer; animation: floatOrb 4s ease-in-out infinite, pulseOrb 2s infinite alternate; transition: 0.3s; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(0,255,204,0.3); }
+    .nova-orb img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+    .nova-orb:hover { transform: scale(1.1); box-shadow: 0 0 50px var(--accent); }
+    @keyframes floatOrb { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+    @keyframes pulseOrb { 0% { filter: brightness(1); } 100% { filter: brightness(1.3); } }
+    
+    .nova-chat { position: fixed; bottom: 100px; right: 30px; width: 350px; height: 450px; background: rgba(10, 14, 22, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(0,255,204,0.2); border-radius: 20px; z-index: 999; display: flex; flex-direction: column; overflow: hidden; opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.95); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+    .nova-chat.active { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
+    .nova-header { padding: 15px 20px; background: rgba(0,255,204,0.1); border-bottom: 1px solid rgba(0,255,204,0.2); display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+    .nova-header img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; filter: drop-shadow(0 0 10px var(--accent)); }
+    .nova-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+    .msg { padding: 10px 15px; border-radius: 12px; font-size: 0.95em; max-width: 85%; line-height: 1.4; animation: popIn 0.3s forwards; }
+    .msg.bot { background: rgba(0,255,204,0.1); border-left: 3px solid var(--accent); color: #fff; align-self: flex-start; border-bottom-left-radius: 2px; }
+    .msg.user { background: rgba(157, 78, 221, 0.2); border-right: 3px solid var(--accent-purple); color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+    .nova-input-area { padding: 15px; display: flex; gap: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .nova-input-area input { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 15px; border-radius: 20px; outline: none; transition: 0.3s; }
+    .nova-input-area input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0,255,204,0.2); }
+    .nova-input-area button { background: transparent; border: none; color: var(--accent); font-size: 1.2em; cursor: pointer; transition: 0.2s; }
+    .nova-input-area button:hover { transform: scale(1.2); text-shadow: 0 0 10px var(--accent); }
+    @keyframes popIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
     /* 3D BACKGROUND */
     #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; }
     .vignette { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, transparent 0%, #020307 100%); z-index: -1; pointer-events: none; }
@@ -74,42 +108,10 @@
     .card p { color: var(--text-sub); line-height: 1.7; font-size: 1.1em; }
 
     @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(50px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-      /* CUSTOM CURSOR */
-    body { cursor: none; }
-    .cursor-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000; box-shadow: 0 0 10px var(--accent); transform: translate(-50%, -50%); }
-    .cursor-outline { width: 40px; height: 40px; border: 1px solid var(--accent-glow); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s; }
-    a:hover ~ .cursor-outline, button:hover ~ .cursor-outline { width: 60px; height: 60px; background: rgba(0, 255, 204, 0.1); }
-
-    /* BOOT SEQUENCE */
-    #boot-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 20000; display: flex; flex-direction: column; padding: 20px; font-family: monospace; color: #00ffcc; font-size: 14px; overflow: hidden; transition: opacity 0.8s ease; }
-    .boot-line { margin: 2px 0; opacity: 0; text-shadow: 0 0 5px rgba(0,255,204,0.5); }
-    #boot-logo-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0; transition: opacity 1s ease; }
-    #boot-logo-container img { width: 150px; filter: drop-shadow(0 0 20px var(--accent)); }
-
-    /* NOVA AI WIDGET */
-    .nova-orb { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, var(--accent) 40%, #0d9488 80%); box-shadow: 0 0 30px var(--accent-glow), inset 0 0 20px #fff; z-index: 1000; cursor: pointer; animation: floatOrb 4s ease-in-out infinite, pulseOrb 2s infinite alternate; transition: 0.3s; }
-    .nova-orb:hover { transform: scale(1.1); box-shadow: 0 0 50px var(--accent); }
-    @keyframes floatOrb { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-    @keyframes pulseOrb { 0% { filter: brightness(1); } 100% { filter: brightness(1.3); } }
-    
-    .nova-chat { position: fixed; bottom: 100px; right: 30px; width: 350px; height: 450px; background: rgba(10, 14, 22, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(0,255,204,0.2); border-radius: 20px; z-index: 999; display: flex; flex-direction: column; overflow: hidden; opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.95); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-    .nova-chat.active { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
-    .nova-header { padding: 15px 20px; background: rgba(0,255,204,0.1); border-bottom: 1px solid rgba(0,255,204,0.2); display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
-    .nova-header i { color: var(--accent); font-size: 1.5em; text-shadow: 0 0 10px var(--accent); }
-    .nova-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-    .msg { padding: 10px 15px; border-radius: 12px; font-size: 0.95em; max-width: 85%; line-height: 1.4; animation: popIn 0.3s forwards; }
-    .msg.bot { background: rgba(0,255,204,0.1); border-left: 3px solid var(--accent); color: #fff; align-self: flex-start; border-bottom-left-radius: 2px; }
-    .msg.user { background: rgba(157, 78, 221, 0.2); border-right: 3px solid var(--accent-purple); color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
-    .nova-input-area { padding: 15px; display: flex; gap: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
-    .nova-input-area input { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 15px; border-radius: 20px; outline: none; transition: 0.3s; }
-    .nova-input-area input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0,255,204,0.2); }
-    .nova-input-area button { background: transparent; border: none; color: var(--accent); font-size: 1.2em; cursor: pointer; transition: 0.2s; }
-    .nova-input-area button:hover { transform: scale(1.2); text-shadow: 0 0 10px var(--accent); }
-    @keyframes popIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
-  <link rel="icon" type="image/png" href="assets/nebulaLogo.png">
 </head>
 <body>
+
   <!-- CUSTOM CURSOR -->
   <div class="cursor-dot" id="cursor-dot"></div>
   <div class="cursor-outline" id="cursor-outline"></div>
@@ -124,10 +126,12 @@
   </div>
 
   <!-- NOVA AI WIDGET -->
-  <div class="nova-orb" id="nova-orb" title="Hablar con Nova AI"></div>
+  <div class="nova-orb" id="nova-orb" title="Hablar con Nova AI">
+    <img src="assets/novaLogo.png" alt="Nova AI">
+  </div>
   <div class="nova-chat" id="nova-chat">
     <div class="nova-header">
-      <i class="fa-solid fa-brain"></i>
+      <img src="assets/novaLogo.png" alt="Nova AI">
       <div>
         <div style="font-size: 1.1em; color: #fff;">Nova AI</div>
         <div style="font-size: 0.7em; color: var(--accent); font-family: 'Inter', sans-serif;">En línea y conectada al Kernel</div>
@@ -150,21 +154,23 @@
     <a href="index.html" class="navbar-brand">NEBULA<span style="color: var(--accent);">OS</span></a>
     <div class="nav-links">
       <a href="index.html" class="nav-link" style="color: var(--accent); text-shadow: 0 0 10px var(--accent-glow);">Inicio</a>
-      <a href="docs/index.html" class="nav-link">DocumentaciÃ³n</a>
+      <a href="docs/index.html" class="nav-link">Documentación</a>
       <a href="manual/index.html" class="nav-link">Manual Interactivo</a>
-      <a href="exposicion/index.html" class="nav-link">ExposiciÃ³n 3D</a>
+      <a href="exposicion/index.html" class="nav-link">Exposición 3D</a>
       <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="nav-btn"><i class="fa-solid fa-download"></i> Descargar OS</a>
     </div>
   </nav>
 
   <section class="hero">
     <div class="hero-content">
-      <img src="assets/nebulaLogo.png" alt="Nebula Logo" style="width: 120px; margin-bottom: 25px; filter: drop-shadow(0 0 15px rgba(0,255,204,0.5)); animation: pulse 3s infinite;">`n      <div class="badge"><i class="fa-solid fa-rocket"></i> VersiÃ³n 2.5 Ultimate Disponible</div>
-      <h1>Explora <span class="highlight">nuevos lÃ­mites.</span></h1>
-      <p>Un ecosistema basado en Linux diseÃ±ado desde cero por programadores y gamers. Optimizado para alto rendimiento, mÃ¡xima seguridad y personalizaciÃ³n hiperespacial. Sin telemetrÃ­a, sin restricciones.</p>
+      <img src="assets/nebulaLogo.png" alt="Nebula Logo" style="width: 120px; margin-bottom: 25px; filter: drop-shadow(0 0 15px rgba(0,255,204,0.5)); animation: floatOrb 4s infinite alternate;">
+      <br>
+      <div class="badge"><i class="fa-solid fa-rocket"></i> Versión 2.5 Ultimate Disponible</div>
+      <h1>Explora <span class="highlight">nuevos límites.</span></h1>
+      <p>Un ecosistema basado en Linux diseñado desde cero por programadores y gamers. Optimizado para alto rendimiento, máxima seguridad y personalización hiperespacial. Sin telemetría, sin restricciones.</p>
       <div class="hero-buttons">
         <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="btn-primary"><i class="fa-solid fa-download"></i> Descargar Ahora</a>
-        <a href="exposicion/index.html" class="btn-secondary"><i class="fa-solid fa-play"></i> Ver PresentaciÃ³n</a>
+        <a href="exposicion/index.html" class="btn-secondary"><i class="fa-solid fa-play"></i> Ver Presentación</a>
       </div>
     </div>
   </section>
@@ -174,18 +180,18 @@
     <div class="grid">
       <a href="docs/index.html" class="card">
         <div class="card-icon-wrap"><i class="fa-solid fa-book"></i></div>
-        <h3>DocumentaciÃ³n</h3>
-        <p>Aprende sobre la arquitectura del sistema, los requisitos de hardware, el proceso de instalaciÃ³n y nuestra filosofÃ­a de cÃ³digo abierto.</p>
+        <h3>Documentación</h3>
+        <p>Aprende sobre la arquitectura del sistema, los requisitos de hardware, el proceso de instalación y nuestra filosofía de código abierto.</p>
       </a>
       <a href="manual/index.html" class="card">
         <div class="card-icon-wrap"><i class="fa-solid fa-hand-pointer"></i></div>
         <h3>Manual Interactivo</h3>
-        <p>Explora la interfaz grÃ¡fica del sistema a travÃ©s de un manual visual. Descubre Nebula Shield, el Gaming HUD y el control de personalizaciÃ³n.</p>
+        <p>Explora la interfaz gráfica del sistema a través de un manual visual. Descubre Nebula Shield, el Gaming HUD y el control de personalización.</p>
       </a>
       <a href="exposicion/index.html" class="card">
         <div class="card-icon-wrap"><i class="fa-solid fa-vr-cardboard"></i></div>
-        <h3>ExposiciÃ³n 3D</h3>
-        <p>Una experiencia de diapositivas hiperespacial diseÃ±ada para defender el proyecto en vivo. Creado con animaciones WebGL y efectos Parallax.</p>
+        <h3>Exposición 3D</h3>
+        <p>Una experiencia de diapositivas hiperespacial diseñada para defender el proyecto en vivo. Creado con animaciones WebGL y efectos Parallax.</p>
       </a>
     </div>
   </section>
@@ -194,15 +200,14 @@
   <footer style="text-align: center; padding: 25px; border-top: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; font-size: 0.9em; background: rgba(2,3,7,0.8); backdrop-filter: blur(10px); position: relative; z-index: 1;">
     &copy; 2026 Nebula OS. Todos los derechos reservados. Creado por Fabricio Grottasanta, Alejandro Saenz y equipo.
   </footer>
-  
+
   <script>
-        // --- CUSTOM CURSOR ---
+    // --- CUSTOM CURSOR ---
     const cursorDot = document.getElementById('cursor-dot');
     const cursorOutline = document.getElementById('cursor-outline');
     window.addEventListener('mousemove', (e) => {
       cursorDot.style.left = e.clientX + 'px';
       cursorDot.style.top = e.clientY + 'px';
-      // Smooth delay para el outline
       cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration: 500, fill: 'forwards' });
     });
 
@@ -221,7 +226,6 @@
     const bootScreen = document.getElementById('boot-screen');
     const bootLogo = document.getElementById('boot-logo-container');
     
-    // Solo mostrar el boot una vez por sesión para no molestar si recargan
     if (!sessionStorage.getItem('booted')) {
       let delay = 100;
       bootLogs.forEach((log, index) => {
@@ -232,7 +236,7 @@
           logContainer.appendChild(div);
           div.animate([{opacity: 0}, {opacity: 1}], {duration: 100, fill: 'forwards'});
         }, delay);
-        delay += Math.random() * 200 + 100; // Velocidad de tipeo hacker
+        delay += Math.random() * 200 + 100;
       });
 
       setTimeout(() => {
@@ -308,7 +312,6 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Generar Galaxia Espiral
     const parameters = { count: 8000, size: 0.015, radius: 20, branches: 4, spin: 1, randomness: 0.5, randomnessPower: 3, insideColor: '#00ffcc', outsideColor: '#9d4edd' };
     
     let geometry = null;
@@ -359,7 +362,6 @@
     camera.position.z = 15;
     camera.lookAt(scene.position);
 
-    // Mouse interaciton
     let mouseX = 0;
     let mouseY = 0;
     window.addEventListener('mousemove', (e) => {
@@ -371,10 +373,8 @@
     const tick = () => {
       const elapsedTime = clock.getElapsedTime();
       
-      // Rotar galaxia
       points.rotation.y = elapsedTime * 0.05;
       
-      // Parallax sutil
       camera.position.x += (mouseX * 5 - camera.position.x) * 0.05;
       camera.position.y += (10 + -mouseY * 5 - camera.position.y) * 0.05;
       camera.lookAt(scene.position);
@@ -392,5 +392,3 @@
   </script>
 </body>
 </html>
-
-
