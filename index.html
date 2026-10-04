@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>NebulaOS - Presentación Espacial 3D</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #05070e;
+      --accent: #00ffcc;
+      --accent-glow: rgba(0, 255, 204, 0.6);
+      --accent-purple: #9d4edd;
+      --text-main: #e2e8f0;
+      --text-sub: #94a3b8;
+      --panel-bg: rgba(10, 14, 22, 0.7);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --blur: blur(25px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      perspective: 1200px;
+    }
+
+    #webgl-canvas {
+      position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none;
+    }
+    
+    .vignette {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at center, transparent 10%, rgba(5, 7, 14, 0.95) 100%);
+      z-index: 1; pointer-events: none;
+    }
+
+    #presentation { position: relative; width: 100%; height: 100%; z-index: 2; }
+    .slide {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 50px 8vw;
+      display: flex; flex-direction: column; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      transform: translateY(40px) scale(0.95);
+    }
+    .slide.active { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
+    .slide.prev { transform: translateY(-40px) scale(0.95); opacity: 0; }
+    .slide.next { transform: translateY(40px) scale(0.95); opacity: 0; }
+
+    .slide .stagger-1, .slide .stagger-2, .slide .stagger-3, .slide .stagger-4 { opacity: 0; }
+    .slide.active .stagger-1 { animation: fadeUp 0.8s forwards; animation-delay: 0.1s; }
+    .slide.active .stagger-2 { animation: fadeUp 0.8s forwards; animation-delay: 0.3s; }
+    .slide.active .stagger-3 { animation: fadeUp 0.8s forwards; animation-delay: 0.5s; }
+    .slide.active .stagger-4 { animation: fadeUp 0.8s forwards; animation-delay: 0.7s; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    .controls { position: absolute; bottom: 30px; right: 40px; z-index: 10; display: flex; gap: 15px; }
+    .btn-nav {
+      background: var(--panel-bg); border: 1px solid var(--panel-border); color: var(--text-main);
+      width: 45px; height: 45px; border-radius: 50%; cursor: pointer; backdrop-filter: var(--blur);
+      transition: 0.3s; font-size: 1.2em; display: grid; place-items: center;
+    }
+    .btn-nav:hover {
+      background: rgba(0, 255, 204, 0.15); border-color: var(--accent); color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow); transform: scale(1.1);
+    }
+    
+    h1, h2, .kicker, h3 { font-family: 'Space Grotesk', sans-serif; }
+    .kicker { color: var(--accent); font-size: 1em; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; font-weight: 700; }
+    h1 {
+      font-size: 5.5em; font-weight: 700; letter-spacing: 2px; margin-bottom: 10px;
+      background: linear-gradient(180deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 20px rgba(0,255,204,0.2));
+    }
+    h2 { font-size: 2.8em; font-weight: 700; margin-bottom: 30px; color: #fff; text-transform: uppercase; }
+    h2 .highlight { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
+    p, li { font-size: 1.15em; color: var(--text-main); line-height: 1.6; }
+
+    .img-showcase {
+      width: 100%; height: auto; border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 2px rgba(0,255,204,0.5);
+      transform: perspective(1000px) rotateY(-15deg) rotateX(5deg) scale(0.95);
+      transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1); transform-style: preserve-3d;
+      border: 1px solid rgba(0,255,204,0.2);
+    }
+    .img-showcase:hover {
+      transform: rotateY(0deg) rotateX(0deg) scale(1.05);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 20px rgba(0,255,204,0.3); border-color: var(--accent);
+    }
+    .img-showcase.right { transform: perspective(1000px) rotateY(15deg) rotateX(5deg) scale(0.95); }
+    .img-showcase.right:hover { transform: rotateY(0deg) rotateX(0deg) scale(1.05); }
+
+    .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; width: 100%; }
+    .card {
+      background: var(--panel-bg); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+      border: 1px solid var(--panel-border); border-radius: 20px; padding: 40px; transition: 0.4s ease;
+    }
+    .card:hover {
+      border-color: rgba(157, 78, 221, 0.4); transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(157, 78, 221, 0.1);
+    }
+    .card i.icon-head { font-size: 2.5em; color: var(--accent-purple); margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(157, 78, 221, 0.6)); }
+    .card h3 { font-size: 1.5em; color: #fff; margin-bottom: 15px; }
+
+    ul { list-style: none; }
+    ul li { margin-bottom: 15px; display: flex; align-items: flex-start; gap: 15px; }
+    ul li i { color: var(--accent); font-size: 1.2em; margin-top: 4px; filter: drop-shadow(0 0 8px var(--accent-glow)); }
+  </style>
+</head>
+<body>
+
+  <!-- CANVAS WEBGL PARA RENDERIZADO 3D -->
+  <canvas id="webgl-canvas"></canvas>
+  <div class="vignette"></div>
+
+  <div id="presentation">
+
+    <!-- PORTADA -->
+    <div class="slide">
+      <div style="max-width: 900px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center;">
+        <img src="nebulaLogo.png" class="stagger-1" style="width: 150px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(0,255,204,0.5));" alt="Nebula Logo">
+        <h1 class="stagger-2">NEBULA OS</h1>
+        <p class="stagger-3" style="font-size: 1.5em; color: var(--text-main); margin-bottom: 30px;">
+          Un ecosistema diseñado para explorar nuevos límites.
+        </p>
+        <p class="stagger-4" style="font-style: italic; color: var(--text-sub);">"Hecho por gamers, para gamers, sin renunciar a la libertad."</p>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 1: FILOSOFÍA Y CARACTERÍSTICAS -->
+    <div class="slide">
+      <div class="kicker stagger-1">Orígenes</div>
+      <h2 class="stagger-1">Nuestra <span class="highlight">Filosofía</span></h2>
+      <div class="card-grid">
+        <div class="card stagger-2">
+          <i class="fa-solid fa-satellite icon-head"></i>
+          <h3>Perspectiva Auténtica</h3>
+          <p>NebulaOS nace de la visión de quienes usan la PC a diario para jugar, programar y crear. Diseñado por programadores y gamers para resolver necesidades tecnológicas reales.</p>
+        </div>
+        <div class="card stagger-3">
+          <i class="fa-solid fa-meteor icon-head"></i>
+          <h3>Potencia y Accesibilidad</h3>
+          <p>Aunque posee un núcleo potente y herramientas avanzadas, su interfaz gráfica está diseñada para que cualquier usuario navegue por el sistema sin conocimientos previos.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide">
+      <div class="kicker stagger-1">Arquitectura Base</div>
+      <h2 class="stagger-1">Características <span class="highlight">Principales</span></h2>
+      <div style="display: flex; gap: 40px; align-items: center;">
+        <div style="flex: 1;">
+          <ul class="stagger-2">
+            <li><i class="fa-solid fa-gauge-high"></i> <div><strong>Rendimiento:</strong> Reducción de procesos innecesarios. Modo Gaming dedicado.</div></li>
+            <li><i class="fa-solid fa-code"></i> <div><strong>Orientación:</strong> Base Linux optimizada para videojuegos y desarrollo.</div></li>
+            <li><i class="fa-solid fa-palette"></i> <div><strong>Diseño Custom:</strong> Entorno minimalista, 100% personalizable (Nebula Designer).</div></li>
+          </ul>
+        </div>
+        <div style="flex: 1;" class="stagger-3">
+          <img src="captura_designer.png" alt="Nebula Designer" class="img-showcase right">
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: REQUISITOS E INSTALACIÓN -->
+    <div class="slide">
+      <div class="kicker stagger-1">Hardware</div>
+      <h2 class="stagger-1">Requisitos del <span class="highlight">Sistema</span></h2>
+      <div class="card-grid">
+        <div class="card stagger-2" style="border-top: 4px solid var(--text-sub);">
+          <i class="fa-solid fa-microchip icon-head" style="color: var(--text-sub); filter: none;"></i>
+          <h3>Requisitos Mínimos</h3>
+          <ul>
+            <li><i class="fa-solid fa-microchip" style="color: var(--text-sub); filter: none;"></i> Dual Core a 2 GHz</li>
+            <li><i class="fa-solid fa-memory" style="color: var(--text-sub); filter: none;"></i> 4 GB RAM</li>
+            <li><i class="fa-solid fa-hard-drive" style="color: var(--text-sub); filter: none;"></i> 25 GB Almacenamiento</li>
+            <li><i class="fa-solid fa-display" style="color: var(--text-sub); filter: none;"></i> OpenGL 2.1</li>
+          </ul>
+        </div>
+        <div class="card stagger-3" style="border-top: 4px solid var(--accent);">
+          <i class="fa-solid fa-rocket icon-head" style="color: var(--accent);"></i>
+          <h3>Recomendados</h3>
+          <ul>
+            <li><i class="fa-solid fa-microchip"></i> Core i3 / Ryzen 3+</li>
+            <li><i class="fa-solid fa-memory"></i> 8 GB RAM</li>
+            <li><i class="fa-solid fa-hard-drive"></i> 50 GB SSD</li>
+            <li><i class="fa-solid fa-display"></i> OpenGL 3.3 (1080p)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide">
+      <div class="kicker stagger-1">Despliegue</div>
+      <h2 class="stagger-1">Proceso de <span class="highlight">Instalación</span></h2>
+      <div style="max-width: 900px; margin: 0 auto; text-align: center;">
+        <p class="stagger-2" style="margin-bottom: 30px; font-size: 1.2em;">Instalador gráfico e intuitivo. <strong>No es necesario usar la terminal en ningún momento.</strong></p>
+        <div class="card stagger-3" style="padding: 40px; display: inline-block; text-align: left;">
+          <ul style="margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px 60px;">
+            <li><i class="fa-solid fa-1"></i> Seleccionar idioma y teclado</li>
+            <li><i class="fa-solid fa-2"></i> Configurar internet (Opcional)</li>
+            <li><i class="fa-solid fa-3"></i> Elegir disco de instalación</li>
+            <li><i class="fa-solid fa-4"></i> Crear usuario y contraseña</li>
+            <li><i class="fa-solid fa-5"></i> Confirmar resumen</li>
+            <li><i class="fa-solid fa-6"></i> Reiniciar e iniciar</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: SEGURIDAD -->
+    <div class="slide">
+      <div class="kicker stagger-1">Protección</div>
+      <h2 class="stagger-1">Enfoque de <span class="highlight">Seguridad</span></h2>
+      <div style="display: flex; gap: 40px; align-items: center; max-width: 1000px; margin: 0 auto;">
+        <div style="flex: 1;" class="card stagger-2">
+           <i class="fa-solid fa-user-shield icon-head"></i>
+           <h3>Defensa Automática</h3>
+           <p>Funciona desde el primer arranque de forma silenciosa, sin exigir conocimientos técnicos al usuario ni interrumpir su flujo de trabajo.</p>
+        </div>
+        <div style="flex: 1;" class="card stagger-3">
+           <i class="fa-solid fa-box-archive icon-head"></i>
+           <h3>Sandbox y Permisos</h3>
+           <p>Aplicaciones en entornos controlados. Un programa malicioso no puede comprometer la raíz. Tareas críticas requieren permiso explícito.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide">
+      <div class="kicker stagger-1">Defensa Activa</div>
+      <h2 class="stagger-1">Herramientas <span class="highlight">Integradas</span></h2>
+      <div style="display: flex; gap: 40px; align-items: center;">
+        <div style="flex: 1;" class="stagger-2">
+          <img src="captura_shield.png" alt="Nebula Shield" class="img-showcase">
+        </div>
+        <div style="flex: 1;">
+          <ul class="stagger-3">
+            <li><i class="fa-solid fa-virus-slash"></i> <div><strong>Nebula Shield:</strong> Antivirus en tiempo real y Firewall personalizable.</div></li>
+            <li><i class="fa-solid fa-fingerprint"></i> <div><strong>Cifrado Total:</strong> Opción de cifrar todo el disco al instalar.</div></li>
+            <li><i class="fa-solid fa-earth-americas"></i> <div><strong>Privacidad:</strong> VPN nativa con servidores globales.</div></li>
+            <li><i class="fa-solid fa-brain"></i> <div><strong>Inteligencia:</strong> Análisis heurístico local y gestor de claves.</div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: COMUNIDAD Y LICENCIA -->
+    <div class="slide">
+      <div class="kicker stagger-1">Ecosistema</div>
+      <h2 class="stagger-1">Redes de <span class="highlight">Soporte</span></h2>
+      <p class="stagger-2" style="text-align: center; margin-bottom: 40px; font-size: 1.2em;">Múltiples canales activos para reportar bugs, aprender o chatear.</p>
+      <div class="card-grid stagger-3" style="grid-template-columns: 1fr 1fr 1fr 1fr; max-width: 1000px; margin: 0 auto; gap: 20px;">
+        <div class="card" style="padding: 25px; text-align: center;">
+          <i class="fa-solid fa-book icon-head" style="margin-bottom: 10px; font-size: 2em; color: var(--accent);"></i>
+          <h3 style="font-size: 1.1em;">Documentación</h3>
+          <p style="font-size: 0.85em;">Wikis oficiales.</p>
+        </div>
+        <div class="card" style="padding: 25px; text-align: center;">
+          <i class="fa-brands fa-discord icon-head" style="margin-bottom: 10px; font-size: 2em; color: #5865F2;"></i>
+          <h3 style="font-size: 1.1em;">Discord</h3>
+          <p style="font-size: 0.85em;">Chat en vivo.</p>
+        </div>
+        <div class="card" style="padding: 25px; text-align: center;">
+          <i class="fa-brands fa-reddit icon-head" style="margin-bottom: 10px; font-size: 2em; color: #FF4500;"></i>
+          <h3 style="font-size: 1.1em;">Reddit</h3>
+          <p style="font-size: 0.85em;">r/nebulaos.</p>
+        </div>
+        <div class="card" style="padding: 25px; text-align: center;">
+          <i class="fa-brands fa-github icon-head" style="margin-bottom: 10px; font-size: 2em; color: #fff;"></i>
+          <h3 style="font-size: 1.1em;">GitHub</h3>
+          <p style="font-size: 0.85em;">Reporte de bugs.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide">
+      <div class="kicker stagger-1">Legalidad</div>
+      <h2 class="stagger-1">Modelo de Licencia <span class="highlight">Dual</span></h2>
+      <div class="card-grid">
+        <div class="card stagger-2" style="border-top: 4px solid #fff;">
+          <i class="fa-brands fa-linux icon-head" style="color: #fff; filter: none;"></i>
+          <h3>GNU GPL v3</h3>
+          <p>Aplica al kernel y sistema base. Garantiza que el sistema se pueda usar, modificar y redistribuir libremente, obligando a mantener el código abierto en todos sus derivados.</p>
+        </div>
+        <div class="card stagger-3" style="border-top: 4px solid var(--accent);">
+          <i class="fa-solid fa-code-branch icon-head" style="color: var(--accent); filter: drop-shadow(0 0 10px var(--accent-glow));"></i>
+          <h3>Licencia MIT</h3>
+          <p>Aplica a las apps propias de nuestro ecosistema (Nebula Store, Nova AI). Permite uso comercial y adopción por terceros sin forzarlos a hacer públicos sus propios cambios.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5: CONCLUSIÓN -->
+    <div class="slide">
+      <div class="kicker stagger-1">Balance</div>
+      <h2 class="stagger-1">Ventajas y <span class="highlight">Desventajas</span></h2>
+      <div class="card-grid">
+        <div class="card stagger-2">
+          <i class="fa-solid fa-arrow-trend-up icon-head"></i>
+          <h3>Ventajas Competitivas</h3>
+          <p>Menor consumo de RAM/CPU. Optimización 100% nativa para gaming (Proton). Gratuito, sin telemetría y cero publicidad.</p>
+        </div>
+        <div class="card stagger-3">
+          <i class="fa-solid fa-people-group icon-head"></i>
+          <h3>Desventaja y Mitigación</h3>
+          <p>Al ser un equipo reducido, la respuesta a bugs puede ser más lenta. Se compensa con contribución abierta, mentorías y uso de librerías estables.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide">
+      <div class="kicker stagger-1">Cierre</div>
+      <h2 class="stagger-1">El punto <span class="highlight">medio perfecto</span></h2>
+      <div style="display: flex; gap: 40px; align-items: center;">
+        <div style="flex: 1;" class="stagger-2">
+          <div class="card" style="border-color: var(--accent); box-shadow: 0 0 40px rgba(0,255,204,0.1);">
+            <i class="fa-solid fa-quote-left" style="font-size: 2em; margin-bottom: 20px; opacity: 0.5;"></i>
+            <p style="font-size: 1.2em; color: #fff; margin-bottom: 20px; font-weight: 300;">
+              Evita la invasión a la privacidad de Windows, las restricciones de macOS y la falta de optimización inicial de otras distros.
+            </p>
+            <p style="font-size: 1.2em; color: var(--accent); font-weight: 600;">
+              "Nebula OS busca ocupar el lugar que otros dejaron vacío: un sistema hecho por gamers, para gamers, sin renunciar a la libertad."
+            </p>
+          </div>
+        </div>
+        <div style="flex: 1.2;" class="stagger-3">
+          <img src="captura_escritorio.png" alt="Escritorio NebulaOS" class="img-showcase right">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Controles -->
+  <div class="controls">
+    <button class="btn-nav" id="btn-prev"><i class="fa-solid fa-chevron-left"></i></button>
+    <button class="btn-nav" id="btn-next"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+
+  <script>
+    // ==========================================
+    // MAGIA 3D AVANZADA CON THREE.JS 
+    // Efectos de transición hiperespacial y objetos 3D espaciales
+    // ==========================================
+    const canvas = document.getElementById('webgl-canvas');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // 1. NEBULOSA DE PARTÍCULAS
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 4000;
+    const posArray = new Float32Array(particlesCount * 3);
+    const colorArray = new Float32Array(particlesCount * 3);
+    const colorCyan = new THREE.Color('#00ffcc');
+    const colorPurple = new THREE.Color('#9d4edd');
+
+    for(let i = 0; i < particlesCount * 3; i+=3) {
+        posArray[i] = (Math.random() - 0.5) * 30; // X spread
+        posArray[i+1] = (Math.random() - 0.5) * 30; // Y spread
+        posArray[i+2] = (Math.random() - 0.5) * 30; // Z spread
+
+        const mixedColor = Math.random() > 0.5 ? colorCyan : colorPurple;
+        colorArray[i] = mixedColor.r;
+        colorArray[i+1] = mixedColor.g;
+        colorArray[i+2] = mixedColor.b;
+    }
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+
+    const particlesMaterial = new THREE.PointsMaterial({
+        size: 0.03,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.7,
+        blending: THREE.AdditiveBlending
+    });
+    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particlesMesh);
+
+    // 2. PLANETA DE ALAMBRE (WIREFRAME PLANET)
+    const planetGeo = new THREE.SphereGeometry(3, 32, 32);
+    const planetMat = new THREE.MeshBasicMaterial({
+        color: 0x9d4edd,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.2
+    });
+    const planetMesh = new THREE.Mesh(planetGeo, planetMat);
+    planetMesh.position.set(-6, 2, -15);
+    scene.add(planetMesh);
+
+    // 3. ANILLOS DEL PLANETA
+    const ringGeo = new THREE.RingGeometry(3.5, 5, 64);
+    const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x00ffcc,
+        side: THREE.DoubleSide,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.15
+    });
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+    ringMesh.rotation.x = Math.PI / 2;
+    planetMesh.add(ringMesh);
+
+    // 4. SOL / ESTRELLA DISTANTE
+    const starGeo = new THREE.SphereGeometry(1.5, 32, 32);
+    const starMat = new THREE.MeshBasicMaterial({
+        color: 0x00ffcc,
+        transparent: true,
+        opacity: 0.8
+    });
+    const starMesh = new THREE.Mesh(starGeo, starMat);
+    starMesh.position.set(8, -4, -25);
+    scene.add(starMesh);
+
+    // Resplandor de la estrella
+    const glowGeo = new THREE.SphereGeometry(2.5, 32, 32);
+    const glowMat = new THREE.MeshBasicMaterial({
+        color: 0x00ffcc,
+        transparent: true,
+        opacity: 0.2,
+        blending: THREE.AdditiveBlending
+    });
+    const glowMesh = new THREE.Mesh(glowGeo, glowMat);
+    starMesh.add(glowMesh);
+
+    camera.position.z = 5;
+
+    // INTERACTIVIDAD Y PARALLAX
+    let mouseX = 0;
+    let mouseY = 0;
+    document.addEventListener('mousemove', (event) => {
+        mouseX = (event.clientX / window.innerWidth) - 0.5;
+        mouseY = (event.clientY / window.innerHeight) - 0.5;
+    });
+
+    // VARIABLES DE TRANSICIÓN (VIAJE ESPACIAL AL CAMBIAR SLIDE)
+    let targetCameraZ = 5;
+    let targetSceneRotationY = 0;
+    let targetSceneRotationX = 0;
+    let transitionSpeed = 0.05;
+
+    const clock = new THREE.Clock();
+
+    function tick() {
+        const elapsedTime = clock.getElapsedTime();
+
+        // Rotación continua suave del universo
+        particlesMesh.rotation.y += 0.0005;
+        
+        // Rotación del planeta y sus anillos
+        planetMesh.rotation.y += 0.002;
+        planetMesh.rotation.x += 0.001;
+        ringMesh.rotation.z -= 0.005;
+
+        // Pulso de la estrella distante
+        const scale = 1 + Math.sin(elapsedTime * 2) * 0.1;
+        glowMesh.scale.set(scale, scale, scale);
+
+        // TRANSICIÓN DE DIAPOSITIVA (Warp effect)
+        // La cámara avanza hacia adelante y toda la escena rota
+        camera.position.z += (targetCameraZ - camera.position.z) * transitionSpeed;
+        scene.rotation.y += (targetSceneRotationY - scene.rotation.y) * transitionSpeed;
+        scene.rotation.x += (targetSceneRotationX - scene.rotation.x) * transitionSpeed;
+
+        // Parallax sutil con el mouse por encima de todo
+        camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.05;
+        camera.position.y += (-mouseY * 1.5 - camera.position.y) * 0.05;
+        camera.lookAt(scene.position);
+
+        renderer.render(scene, camera);
+        window.requestAnimationFrame(tick);
+    }
+    tick();
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ==========================================
+    // MOTOR DE SLIDES HTML
+    // ==========================================
+    const slides = document.querySelectorAll('.slide');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    let currentSlide = 0;
+
+    function trigger3DTransition() {
+        // Hacemos que la cámara viaje hacia adelante (z disminuye)
+        targetCameraZ = 5 - (currentSlide * 1.5);
+        
+        // Hacemos que la galaxia entera rote agresivamente dando sensación de vuelo
+        targetSceneRotationY = currentSlide * (Math.PI / 4);
+        targetSceneRotationX = currentSlide * 0.1;
+        
+        // Aceleramos la transición temporalmente
+        transitionSpeed = 0.08;
+        setTimeout(() => transitionSpeed = 0.03, 1000);
+    }
+
+    function updateSlides() {
+      slides.forEach((slide, index) => {
+        slide.classList.remove('active', 'prev', 'next');
+        if (index === currentSlide) slide.classList.add('active');
+        else if (index < currentSlide) slide.classList.add('prev');
+        else slide.classList.add('next');
+      });
+      btnPrev.style.opacity = currentSlide === 0 ? '0.3' : '1';
+      btnPrev.style.pointerEvents = currentSlide === 0 ? 'none' : 'all';
+      btnNext.style.opacity = currentSlide === slides.length - 1 ? '0.3' : '1';
+      btnNext.style.pointerEvents = currentSlide === slides.length - 1 ? 'none' : 'all';
+      
+      trigger3DTransition();
+    }
+
+    btnNext.addEventListener('click', () => { if (currentSlide < slides.length - 1) { currentSlide++; updateSlides(); } });
+    btnPrev.addEventListener('click', () => { if (currentSlide > 0) { currentSlide--; updateSlides(); } });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+        if (currentSlide < slides.length - 1) { currentSlide++; updateSlides(); }
+      } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+        if (currentSlide > 0) { currentSlide--; updateSlides(); }
+      }
+    });
+
+    updateSlides();
+  </script>
+</body>
+</html>
