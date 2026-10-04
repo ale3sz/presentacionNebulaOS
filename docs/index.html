@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Documentación | NebulaOS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --bg-dark: #05070e; --sidebar: #0a0e17; --accent: #00ffcc; --text-main: #e2e8f0; --text-sub: #94a3b8; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+    
+    /* NAVBAR */
+    .navbar { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(5, 7, 14, 0.95); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 5%; z-index: 1000; }
+    .navbar-brand { color: #fff; font-size: 1.5em; font-weight: 700; text-decoration: none; font-family: 'Space Grotesk', sans-serif; }
+    .navbar-brand span { color: var(--accent); }
+    .nav-links { display: flex; gap: 30px; align-items: center; }
+    .nav-link { color: var(--text-main); text-decoration: none; font-weight: 500; transition: 0.3s; }
+    .nav-link:hover { color: var(--accent); }
+    .nav-btn { background: rgba(0, 255, 204, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; }
+
+    /* LAYOUT DOCS */
+    .docs-container { display: flex; margin-top: 70px; flex: 1; }
+    .sidebar { width: 280px; background: var(--sidebar); border-right: 1px solid rgba(255,255,255,0.05); padding: 30px 20px; position: fixed; height: calc(100vh - 70px); overflow-y: auto; }
+    .sidebar h3 { font-family: 'Space Grotesk', sans-serif; color: #fff; margin-bottom: 20px; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; }
+    .sidebar a { display: block; color: var(--text-sub); text-decoration: none; padding: 10px 15px; border-radius: 6px; margin-bottom: 5px; transition: 0.2s; }
+    .sidebar a:hover, .sidebar a.active { background: rgba(0,255,204,0.1); color: var(--accent); }
+
+    .content { margin-left: 280px; padding: 50px 8%; max-width: 1000px; line-height: 1.7; }
+    .content h1 { font-family: 'Space Grotesk', sans-serif; font-size: 3em; margin-bottom: 20px; color: #fff; }
+    .content h2 { font-family: 'Space Grotesk', sans-serif; font-size: 2em; margin-top: 50px; margin-bottom: 20px; color: var(--accent); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+    .content p { margin-bottom: 20px; font-size: 1.1em; color: var(--text-sub); }
+    .content ul { margin-bottom: 20px; padding-left: 20px; }
+    .content li { margin-bottom: 10px; color: var(--text-sub); }
+    .content .alert { background: rgba(157, 78, 221, 0.1); border-left: 4px solid #9d4edd; padding: 20px; border-radius: 0 8px 8px 0; margin: 30px 0; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="../index.html" class="navbar-brand">NEBULA<span>OS</span></a>
+    <div class="nav-links">
+      <a href="../index.html" class="nav-link">Inicio</a>
+      <a href="index.html" class="nav-link" style="color: var(--accent);">Documentación</a>
+      <a href="../manual/index.html" class="nav-link">Manual de Usuario</a>
+      <a href="../exposicion/index.html" class="nav-link">Exposición</a>
+      <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="nav-btn"><i class="fa-solid fa-download"></i> Descargar OS</a>
+    </div>
+  </nav>
+
+  <div class="docs-container">
+    <div class="sidebar">
+      <h3>Contenido</h3>
+      <a href="#introduccion" class="active">Introducción y Filosofía</a>
+      <a href="#requisitos">Requisitos del Sistema</a>
+      <a href="#instalacion">Proceso de Instalación</a>
+      <a href="#seguridad">Enfoque de Seguridad</a>
+      <a href="#licencia">Licencias y Legalidad</a>
+    </div>
+
+    <div class="content">
+      <h1 id="introduccion">Documentación Oficial</h1>
+      <p>Bienvenido a la documentación oficial de Nebula OS. Aquí encontrarás toda la información teórica y técnica del sistema.</p>
+
+      <div class="alert">
+        <strong>Nota del Equipo:</strong> NebulaOS fue diseñado desde cero pensando en el usuario moderno: desarrolladores y gamers que necesitan exprimir al máximo su hardware sin lidiar con procesos ocultos o falta de privacidad.
+      </div>
+
+      <h2 id="requisitos">Requisitos del Sistema</h2>
+      <p>Nebula OS está optimizado para consumir lo mínimo indispensable, pero para disfrutar del <strong>Modo Juego</strong> y el <strong>Nebula Designer</strong> con efectos 3D, sugerimos cumplir los recomendados.</p>
+      <ul>
+        <li><strong>Mínimos:</strong> Procesador Dual Core 2 GHz, 4 GB RAM, 25 GB Almacenamiento, GPU compatible con OpenGL 2.1.</li>
+        <li><strong>Recomendados:</strong> Procesador Core i3 / Ryzen 3 o superior, 8 GB RAM, 50 GB SSD, GPU compatible con OpenGL 3.3.</li>
+      </ul>
+
+      <h2 id="instalacion">Proceso de Instalación</h2>
+      <p>Nuestra filosofía es que "poderoso no significa difícil". El instalador gráfico Calamares te guiará paso a paso:</p>
+      <ul>
+        <li>Selección de idioma y distribución de teclado.</li>
+        <li>Conexión a red WiFi/Ethernet para descargar parches críticos durante la instalación.</li>
+        <li>Particionado automático o manual (recomendado cifrado LUKS).</li>
+        <li>Creación de usuario maestro.</li>
+      </ul>
+
+      <h2 id="seguridad">Enfoque de Seguridad (Nebula Shield)</h2>
+      <p>El módulo Nebula Shield funciona a nivel del kernel para proveer:</p>
+      <ul>
+        <li><strong>Antivirus y Firewall:</strong> Bloqueo proactivo de conexiones entrantes no autorizadas.</li>
+        <li><strong>VPN Nativa:</strong> Enrutamiento opcional de tu tráfico para máxima privacidad.</li>
+        <li><strong>Sandbox:</strong> Las aplicaciones privativas se ejecutan en contenedores aislados que no pueden acceder a tus archivos personales sin tu permiso explícito.</li>
+      </ul>
+
+      <h2 id="licencia">Licencias (GPL v3 y MIT)</h2>
+      <p>Utilizamos un modelo de licencia dual para asegurar el crecimiento del ecosistema:</p>
+      <ul>
+        <li><strong>El Kernel y el Sistema Base</strong> operan bajo la licencia <strong>GNU GPL v3</strong>. Esto garantiza que el corazón de NebulaOS siempre será libre, auditable y sin puertas traseras.</li>
+        <li><strong>Aplicaciones Propias (Nebula Store, Nova AI)</strong> operan bajo licencia <strong>MIT</strong>, fomentando que empresas de software de terceros porten sus juegos y herramientas a nuestra plataforma sin restricciones agresivas.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Simple scrollspy para el sidebar
+    const sections = document.querySelectorAll("h2, h1");
+    const navLinks = document.querySelectorAll(".sidebar a");
+    
+    window.addEventListener("scroll", () => {
+      let current = "";
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 100) { current = section.getAttribute("id"); }
+      });
+      navLinks.forEach(link => {
+        link.classList.remove("active");
+        if (link.getAttribute("href").includes(current)) { link.classList.add("active"); }
+      });
+    });
+  </script>
+</body>
+</html>

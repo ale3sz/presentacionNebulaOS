@@ -1,11 +1,101 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>NebulaOS</title>
-    <style>body { background: #05070e; color: #00ffcc; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }</style>
+  <meta charset="utf-8">
+  <title>NebulaOS | El ecosistema definitivo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-dark: #05070e;
+      --accent: #00ffcc;
+      --accent-glow: rgba(0, 255, 204, 0.6);
+      --accent-purple: #9d4edd;
+      --text-main: #e2e8f0;
+      --text-sub: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); overflow-x: hidden; }
+    
+    /* NAVBAR GLOBAL */
+    .navbar { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(5, 7, 14, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 8vw; z-index: 1000; }
+    .navbar-brand { color: #fff; font-size: 1.5em; font-weight: 700; text-decoration: none; font-family: 'Space Grotesk', sans-serif; letter-spacing: 1px; }
+    .navbar-brand span { color: var(--accent); }
+    .nav-links { display: flex; gap: 30px; align-items: center; }
+    .nav-link { color: var(--text-main); text-decoration: none; font-weight: 500; font-size: 0.95em; transition: 0.3s; }
+    .nav-link:hover { color: var(--accent); }
+    .nav-btn { background: rgba(0, 255, 204, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: 0.3s; }
+    .nav-btn:hover { background: var(--accent); color: var(--bg-dark); box-shadow: 0 0 15px var(--accent-glow); }
+
+    /* HERO SECTION */
+    .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; overflow: hidden; }
+    .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1a1f2e 0%, #05070e 100%); z-index: 0; }
+    .hero-content { position: relative; z-index: 1; max-width: 900px; animation: fadeUp 1s ease-out; }
+    .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 5vw; font-weight: 700; margin-bottom: 20px; line-height: 1.1; background: linear-gradient(180deg, #fff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { font-size: 1.3em; color: var(--text-sub); margin-bottom: 40px; line-height: 1.6; }
+    .hero-buttons { display: flex; gap: 20px; justify-content: center; }
+    .btn-primary { background: var(--accent); color: var(--bg-dark); padding: 15px 35px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 1.1em; transition: 0.3s; box-shadow: 0 0 20px var(--accent-glow); }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 30px var(--accent-glow); }
+    .btn-secondary { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 15px 35px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.1em; transition: 0.3s; backdrop-filter: blur(10px); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+    /* CARDS SECTION */
+    .features { padding: 100px 8vw; background: var(--bg-dark); position: relative; z-index: 1; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+    .card { background: rgba(13, 17, 28, 0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 40px; transition: 0.4s; backdrop-filter: blur(20px); text-decoration: none; color: inherit; display: block; }
+    .card:hover { transform: translateY(-10px); border-color: rgba(157, 78, 221, 0.4); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .card i { font-size: 2.5em; color: var(--accent-purple); margin-bottom: 20px; }
+    .card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.5em; margin-bottom: 15px; color: #fff; }
+    .card p { color: var(--text-sub); line-height: 1.6; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
 </head>
 <body>
-    <h1>Sitio Oficial de NebulaOS en construcción...</h1>
+
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">NEBULA<span>OS</span></a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link" style="color: var(--accent);">Inicio</a>
+      <a href="docs/index.html" class="nav-link">Documentación</a>
+      <a href="manual/index.html" class="nav-link">Manual de Usuario</a>
+      <a href="exposicion/index.html" class="nav-link">Exposición</a>
+      <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="nav-btn"><i class="fa-solid fa-download"></i> Descargar OS</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <h1>Explora nuevos límites.</h1>
+      <p>Un ecosistema basado en Linux diseñado desde cero por programadores y gamers. Optimizado para alto rendimiento, máxima seguridad y personalización sin límites. Sin telemetría, sin restricciones.</p>
+      <div class="hero-buttons">
+        <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="btn-primary"><i class="fa-solid fa-download"></i> Descargar v2.5</a>
+        <a href="exposicion/index.html" class="btn-secondary"><i class="fa-solid fa-play"></i> Ver Presentación</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="grid">
+      <a href="docs/index.html" class="card">
+        <i class="fa-solid fa-book"></i>
+        <h3>Documentación</h3>
+        <p>Aprende sobre la arquitectura del sistema, los requisitos de hardware, el proceso de instalación y nuestra filosofía de código abierto.</p>
+      </a>
+      <a href="manual/index.html" class="card">
+        <i class="fa-solid fa-hand-pointer"></i>
+        <h3>Manual Interactivo</h3>
+        <p>Explora la interfaz gráfica del sistema a través de un manual visual. Descubre Nebula Shield, el Gaming HUD y el control de personalización.</p>
+      </a>
+      <a href="exposicion/index.html" class="card">
+        <i class="fa-solid fa-vr-cardboard"></i>
+        <h3>Exposición 3D</h3>
+        <p>Una experiencia de diapositivas hiperespacial diseñada para defender el proyecto en vivo con animaciones WebGL.</p>
+      </a>
+    </div>
+  </section>
+
 </body>
 </html>
