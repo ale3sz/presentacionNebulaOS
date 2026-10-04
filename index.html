@@ -74,10 +74,73 @@
     .card p { color: var(--text-sub); line-height: 1.7; font-size: 1.1em; }
 
     @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(50px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+      /* CUSTOM CURSOR */
+    body { cursor: none; }
+    .cursor-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000; box-shadow: 0 0 10px var(--accent); transform: translate(-50%, -50%); }
+    .cursor-outline { width: 40px; height: 40px; border: 1px solid var(--accent-glow); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s; }
+    a:hover ~ .cursor-outline, button:hover ~ .cursor-outline { width: 60px; height: 60px; background: rgba(0, 255, 204, 0.1); }
+
+    /* BOOT SEQUENCE */
+    #boot-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 20000; display: flex; flex-direction: column; padding: 20px; font-family: monospace; color: #00ffcc; font-size: 14px; overflow: hidden; transition: opacity 0.8s ease; }
+    .boot-line { margin: 2px 0; opacity: 0; text-shadow: 0 0 5px rgba(0,255,204,0.5); }
+    #boot-logo-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0; transition: opacity 1s ease; }
+    #boot-logo-container img { width: 150px; filter: drop-shadow(0 0 20px var(--accent)); }
+
+    /* NOVA AI WIDGET */
+    .nova-orb { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, var(--accent) 40%, #0d9488 80%); box-shadow: 0 0 30px var(--accent-glow), inset 0 0 20px #fff; z-index: 1000; cursor: pointer; animation: floatOrb 4s ease-in-out infinite, pulseOrb 2s infinite alternate; transition: 0.3s; }
+    .nova-orb:hover { transform: scale(1.1); box-shadow: 0 0 50px var(--accent); }
+    @keyframes floatOrb { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+    @keyframes pulseOrb { 0% { filter: brightness(1); } 100% { filter: brightness(1.3); } }
+    
+    .nova-chat { position: fixed; bottom: 100px; right: 30px; width: 350px; height: 450px; background: rgba(10, 14, 22, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(0,255,204,0.2); border-radius: 20px; z-index: 999; display: flex; flex-direction: column; overflow: hidden; opacity: 0; pointer-events: none; transform: translateY(20px) scale(0.95); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+    .nova-chat.active { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
+    .nova-header { padding: 15px 20px; background: rgba(0,255,204,0.1); border-bottom: 1px solid rgba(0,255,204,0.2); display: flex; align-items: center; gap: 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+    .nova-header i { color: var(--accent); font-size: 1.5em; text-shadow: 0 0 10px var(--accent); }
+    .nova-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+    .msg { padding: 10px 15px; border-radius: 12px; font-size: 0.95em; max-width: 85%; line-height: 1.4; animation: popIn 0.3s forwards; }
+    .msg.bot { background: rgba(0,255,204,0.1); border-left: 3px solid var(--accent); color: #fff; align-self: flex-start; border-bottom-left-radius: 2px; }
+    .msg.user { background: rgba(157, 78, 221, 0.2); border-right: 3px solid var(--accent-purple); color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+    .nova-input-area { padding: 15px; display: flex; gap: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .nova-input-area input { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 15px; border-radius: 20px; outline: none; transition: 0.3s; }
+    .nova-input-area input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0,255,204,0.2); }
+    .nova-input-area button { background: transparent; border: none; color: var(--accent); font-size: 1.2em; cursor: pointer; transition: 0.2s; }
+    .nova-input-area button:hover { transform: scale(1.2); text-shadow: 0 0 10px var(--accent); }
+    @keyframes popIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
   <link rel="icon" type="image/png" href="assets/nebulaLogo.png">
 </head>
 <body>
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-outline" id="cursor-outline"></div>
+
+  <!-- BOOT SEQUENCE SCREEN -->
+  <div id="boot-screen">
+    <div id="boot-logs"></div>
+    <div id="boot-logo-container">
+      <img src="assets/nebulaLogo.png" alt="Nebula Logo">
+      <h2 style="font-family: 'Space Grotesk', sans-serif; color: #fff; margin-top: 20px; letter-spacing: 5px;">SISTEMA EN LÍNEA</h2>
+    </div>
+  </div>
+
+  <!-- NOVA AI WIDGET -->
+  <div class="nova-orb" id="nova-orb" title="Hablar con Nova AI"></div>
+  <div class="nova-chat" id="nova-chat">
+    <div class="nova-header">
+      <i class="fa-solid fa-brain"></i>
+      <div>
+        <div style="font-size: 1.1em; color: #fff;">Nova AI</div>
+        <div style="font-size: 0.7em; color: var(--accent); font-family: 'Inter', sans-serif;">En línea y conectada al Kernel</div>
+      </div>
+    </div>
+    <div class="nova-body" id="nova-body">
+      <div class="msg bot">¡Hola! Soy Nova, la Inteligencia Artificial nativa de NebulaOS. ¿En qué puedo ayudarte a explorar el sistema?</div>
+    </div>
+    <div class="nova-input-area">
+      <input type="text" id="nova-input" placeholder="Pregúntame algo..." autocomplete="off">
+      <button id="nova-send"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
 
   <!-- BACKGROUND 3D GALAXY -->
   <canvas id="webgl-canvas"></canvas>
@@ -133,6 +196,109 @@
   </footer>
   
   <script>
+        // --- CUSTOM CURSOR ---
+    const cursorDot = document.getElementById('cursor-dot');
+    const cursorOutline = document.getElementById('cursor-outline');
+    window.addEventListener('mousemove', (e) => {
+      cursorDot.style.left = e.clientX + 'px';
+      cursorDot.style.top = e.clientY + 'px';
+      // Smooth delay para el outline
+      cursorOutline.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration: 500, fill: 'forwards' });
+    });
+
+    // --- BOOT SEQUENCE ---
+    const bootLogs = [
+      "BIOS Date 10/04/26 19:35:10 Ver 2.5",
+      "CPU: AMD Ryzen 9 7950X - 16 Cores OK",
+      "Memory: 32768 MB RAM OK",
+      "[ OK ] Mounting Root Filesystem...",
+      "[ OK ] Starting Nebula Shield Daemon...",
+      "[ OK ] Loading Custom UI Designer...",
+      "[ OK ] Initializing Nova AI Core...",
+      "Welcome to Nebula OS v2.5 Ultimate."
+    ];
+    const logContainer = document.getElementById('boot-logs');
+    const bootScreen = document.getElementById('boot-screen');
+    const bootLogo = document.getElementById('boot-logo-container');
+    
+    // Solo mostrar el boot una vez por sesión para no molestar si recargan
+    if (!sessionStorage.getItem('booted')) {
+      let delay = 100;
+      bootLogs.forEach((log, index) => {
+        setTimeout(() => {
+          const div = document.createElement('div');
+          div.className = 'boot-line';
+          div.textContent = log;
+          logContainer.appendChild(div);
+          div.animate([{opacity: 0}, {opacity: 1}], {duration: 100, fill: 'forwards'});
+        }, delay);
+        delay += Math.random() * 200 + 100; // Velocidad de tipeo hacker
+      });
+
+      setTimeout(() => {
+        logContainer.style.display = 'none';
+        bootLogo.style.opacity = '1';
+        setTimeout(() => {
+          bootScreen.style.opacity = '0';
+          setTimeout(() => bootScreen.style.display = 'none', 800);
+          sessionStorage.setItem('booted', 'true');
+        }, 1500);
+      }, delay + 300);
+    } else {
+      bootScreen.style.display = 'none';
+    }
+
+    // --- NOVA AI CHAT LOGIC ---
+    const novaOrb = document.getElementById('nova-orb');
+    const novaChat = document.getElementById('nova-chat');
+    const novaInput = document.getElementById('nova-input');
+    const novaSend = document.getElementById('nova-send');
+    const novaBody = document.getElementById('nova-body');
+
+    novaOrb.addEventListener('click', () => {
+      novaChat.classList.toggle('active');
+    });
+
+    const botResponses = [
+      { keys: ['requisitos', 'ram', 'cpu', 'necesito'], res: "Nebula OS pide mínimo un Dual Core a 2 GHz y 4GB de RAM. Pero para gaming fluido te recomiendo un i3/Ryzen 3 con 8GB de RAM y SSD." },
+      { keys: ['seguridad', 'virus', 'antivirus', 'shield'], res: "El sistema cuenta con Nebula Shield integrado en el Kernel: un Antivirus en tiempo real, Firewall, y Sandbox para aplicaciones. Estás 100% blindado." },
+      { keys: ['descargar', 'instalar', 'bajar'], res: "Puedes simular la descarga clickeando el botón 'Descargar Ahora' en la página principal, te llevará al repositorio oficial del sistema." },
+      { keys: ['hola', 'buenas'], res: "¡Hola! Bienvenido al universo Nebula. ¿Quieres saber sobre los requisitos, la seguridad o cómo personalizar el sistema?" },
+      { keys: ['personalizar', 'designer', 'colores'], res: "Con Nebula Designer puedes cambiar colores, niveles de desenfoque (blur), formas de ventanas y activar efectos de Parallax estelares." }
+    ];
+
+    function appendMessage(text, sender) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'msg ' + sender;
+      msgDiv.textContent = text;
+      novaBody.appendChild(msgDiv);
+      novaBody.scrollTop = novaBody.scrollHeight;
+    }
+
+    function handleChat() {
+      const text = novaInput.value.trim().toLowerCase();
+      if (!text) return;
+      appendMessage(novaInput.value, 'user');
+      novaInput.value = '';
+      
+      setTimeout(() => {
+        let responded = false;
+        for (let item of botResponses) {
+          if (item.keys.some(key => text.includes(key))) {
+            appendMessage(item.res, 'bot');
+            responded = true;
+            break;
+          }
+        }
+        if (!responded) {
+          appendMessage("Procesando consulta... Como soy una demo de Nova AI, te sugiero preguntar sobre 'requisitos', 'seguridad' o 'personalización'.", 'bot');
+        }
+      }, 600);
+    }
+
+    novaSend.addEventListener('click', handleChat);
+    novaInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleChat(); });
+
     // --- THREE.JS GALAXY BACKGROUND ---
     const canvas = document.getElementById('webgl-canvas');
     const scene = new THREE.Scene();
@@ -226,4 +392,5 @@
   </script>
 </body>
 </html>
+
 
