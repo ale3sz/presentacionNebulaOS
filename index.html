@@ -99,11 +99,14 @@
     .section-title { text-align: center; font-family: 'Space Grotesk', sans-serif; font-size: 3em; margin-bottom: 80px; color: #fff; }
     .section-title span { color: var(--accent-purple); text-shadow: 0 0 20px var(--accent-purple-glow); }
     
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; }
-    .card { background: rgba(10, 12, 20, 0.4); border: 1px solid rgba(0,255,204,0.1); border-radius: 24px; padding: 50px 40px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); text-decoration: none; color: inherit; display: block; position: relative; overflow: hidden; }
-    .card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(0,255,204,0.1) 0%, transparent 60%); opacity: 0; transition: 0.5s; pointer-events: none; }
+    
+    /* MOUSE GLOW CARD EFFECT */
+    .grid { position: relative; }
+    .card { background: rgba(10, 12, 20, 0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 50px 40px; position: relative; overflow: hidden; text-decoration: none; color: inherit; display: block; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(0, 255, 204, 0.15), transparent 40%); z-index: -1; opacity: 0; transition: opacity 0.5s; }
     .card:hover::before { opacity: 1; }
-    .card:hover { transform: translateY(-15px); border-color: var(--accent); box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 30px rgba(0,255,204,0.2); }
+    .card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); border-color: rgba(0,255,204,0.3); }
+
     
     .card-icon-wrap { width: 80px; height: 80px; border-radius: 20px; background: rgba(157, 78, 221, 0.1); border: 1px solid rgba(157, 78, 221, 0.3); display: flex; justify-content: center; align-items: center; margin-bottom: 30px; transition: 0.4s; }
     .card:hover .card-icon-wrap { background: rgba(0, 255, 204, 0.15); border-color: var(--accent); box-shadow: 0 0 20px rgba(0,255,204,0.4); transform: scale(1.1) rotate(5deg); }
@@ -400,6 +403,20 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
   </script>
+
+  <script>
+    // MAGIA GLOW EFFECT EN LAS CARDS
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', ${x}px);
+        card.style.setProperty('--mouse-y', ${y}px);
+      });
+    });
+  </script>
+
 </body>
 </html>
 
