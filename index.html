@@ -345,15 +345,27 @@
     });
   </script>
 
+
   <script>
     // ==========================================
     // MOTOR DE AUDIO SINTETIZADO (WEB AUDIO API)
     // ==========================================
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
+    // We create a wrapper to ensure AudioContext is resumed on user interaction
+    function unlockAudio() {
+        if(audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('keydown', unlockAudio);
+    }
+    document.addEventListener('click', unlockAudio);
+    document.addEventListener('keydown', unlockAudio);
+
     const NebulaSound = {
         playHover: () => {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
+            if(audioCtx.state === 'suspended') return;
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             osc.type = 'sine';
@@ -397,7 +409,6 @@
         }
     };
 
-    // Agregar sonido de hover a botones y cards
     document.querySelectorAll('.btn-primary, .btn-secondary, .card, .nav-link').forEach(el => {
         el.addEventListener('mouseenter', NebulaSound.playHover);
     });
@@ -427,7 +438,6 @@
         novaBody.scrollTop = novaBody.scrollHeight;
     }
 
-    // MATRIX EFFECT
     function startMatrix() {
         const canvas = document.createElement('canvas');
         canvas.style.position = 'fixed';
@@ -438,11 +448,11 @@
         document.body.appendChild(canvas);
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%""'#&_(),.;:?!\|{}<>[]^~';
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*%=#&_<>[]~";
         const fontSize = 16;
         const columns = canvas.width / fontSize;
         const drops = Array.from({length: columns}).fill(1);
-        setInterval(() => {
+        const matrixInterval = setInterval(() => {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#0f0';
@@ -454,17 +464,19 @@
                 drops[i]++;
             });
         }, 33);
-        setTimeout(() => canvas.remove(), 10000); // Stop after 10s
+        setTimeout(() => {
+            clearInterval(matrixInterval);
+            canvas.remove();
+        }, 10000);
     }
 
-    // GLITCH EFFECT
     function triggerGlitch() {
         document.body.style.animation = 'glitchAnim 0.3s infinite';
         setTimeout(() => { document.body.style.animation = 'none'; }, 1000);
     }
 
     const styleGlitch = document.createElement('style');
-    styleGlitch.innerHTML = @keyframes glitchAnim { 0% { filter: hue-rotate(0deg) invert(0); transform: translate(0); } 20% { filter: hue-rotate(90deg) invert(1); transform: translate(-5px, 5px); } 40% { filter: hue-rotate(0deg) invert(0); transform: translate(5px, -5px); } 60% { filter: hue-rotate(180deg) invert(1); transform: translate(-5px, -5px); } 80% { filter: hue-rotate(0deg) invert(0); transform: translate(5px, 5px); } 100% { filter: hue-rotate(0deg) invert(0); transform: translate(0); } };
+    styleGlitch.innerHTML = "@keyframes glitchAnim { 0% { filter: hue-rotate(0deg) invert(0); transform: translate(0); } 20% { filter: hue-rotate(90deg) invert(1); transform: translate(-5px, 5px); } 40% { filter: hue-rotate(0deg) invert(0); transform: translate(5px, -5px); } 60% { filter: hue-rotate(180deg) invert(1); transform: translate(-5px, -5px); } 80% { filter: hue-rotate(0deg) invert(0); transform: translate(5px, 5px); } 100% { filter: hue-rotate(0deg) invert(0); transform: translate(0); } }";
     document.head.appendChild(styleGlitch);
 
     function processNovaCommand(text) {
@@ -485,7 +497,7 @@
                 addMessage('ACCESO CONCEDIDO: MODO ROOT ACTIVADO. Privilegios elevados.', 'bot');
                 document.querySelector('.nova-header span').textContent = 'ROOT SYSTEM';
                 document.querySelector('.nova-header').style.background = 'rgba(255,0,0,0.3)';
-            } else if (lowerText.includes('hola')) {
+            } else if (lowerText.includes('hola') || lowerText.includes('buen')) {
                 addMessage('¡Hola! Soy Nova AI. ¿En qué te puedo ayudar hoy?', 'bot');
             } else {
                 addMessage('Interesante. Mis protocolos están en mantenimiento, pero Nebula OS está listo.', 'bot');
@@ -499,4 +511,3 @@
 
 </body>
 </html>
-
