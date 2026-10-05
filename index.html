@@ -75,14 +75,20 @@
     .nav-btn:hover { background: var(--accent); color: var(--bg-dark); box-shadow: 0 0 25px var(--accent-glow); transform: scale(1.05); }
 
     /* HERO SECTION */
-    .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; z-index: 1; }
+    .hero { position: relative; min-height: 100vh; display: flex; flex-direction: row; justify-content: space-between; align-items: center; text-align: left; padding: 0 8vw; z-index: 1; overflow: hidden; }
+    .hero-content { position: relative; max-width: 600px; animation: slideUpFade 1.2s cubic-bezier(0.16, 1, 0.3, 1); z-index: 2; }
+    .hero-spline { width: 45vw; height: 80vh; position: absolute; right: 2vw; top: 10vh; animation: floatSpline 6s ease-in-out infinite; z-index: 1; }
+    @keyframes floatSpline { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.02); } }
+    .hero h1 { font-size: 5vw; text-align: left; }
+    .hero p { text-align: left; margin-left: 0; }
+    .hero-buttons { justify-content: flex-start; }
     .hero-content { position: relative; max-width: 1000px; animation: slideUpFade 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
     .badge { display: inline-block; padding: 8px 16px; background: rgba(157, 78, 221, 0.15); border: 1px solid var(--accent-purple); color: #d8b4fe; border-radius: 30px; font-size: 0.9em; font-weight: 600; margin-bottom: 30px; letter-spacing: 1px; box-shadow: 0 0 15px rgba(157, 78, 221, 0.3); backdrop-filter: blur(5px); }
-    .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 6vw; font-weight: 700; margin-bottom: 25px; line-height: 1.1; color: #fff; text-shadow: 0 0 40px rgba(255,255,255,0.2); }
+    .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 5vw; font-weight: 700; margin-bottom: 25px; line-height: 1.1; color: #fff; text-shadow: 0 0 40px rgba(255,255,255,0.2); }
     .hero h1 .highlight { background: linear-gradient(to right, var(--accent), #5eead4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(0,255,204,0.4)); }
     .hero p { font-size: 1.4em; color: var(--text-sub); margin-bottom: 50px; line-height: 1.6; max-width: 800px; margin-left: auto; margin-right: auto; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
     
-    .hero-buttons { display: flex; gap: 25px; justify-content: center; }
+    .hero-buttons { display: flex; gap: 25px; justify-content: flex-start; }
     .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, #0d9488 100%); color: var(--bg-dark); padding: 18px 45px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 1.2em; transition: 0.4s; box-shadow: 0 10px 30px rgba(0,255,204,0.3); border: 1px solid rgba(255,255,255,0.5); }
     .btn-primary:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 40px rgba(0,255,204,0.6); }
     .btn-secondary { background: rgba(10, 14, 22, 0.5); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 18px 45px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 1.2em; transition: 0.4s; backdrop-filter: blur(15px); }
@@ -109,6 +115,7 @@
 
     @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(50px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
   </style>
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.0.94/build/spline-viewer.js"></script>
 </head>
 <body>
 
@@ -161,17 +168,20 @@
     </div>
   </nav>
 
-  <section class="hero">
+    <section class="hero">
     <div class="hero-content">
-      <img src="assets/nebulaLogo.png" alt="Nebula Logo" style="width: 120px; margin-bottom: 25px; filter: drop-shadow(0 0 15px rgba(0,255,204,0.5)); animation: floatOrb 4s infinite alternate;">
-      <br>
-      <div class="badge"><i class="fa-solid fa-rocket"></i> Versión 2.5 Ultimate Disponible</div>
-      <h1>Explora <span class="highlight">nuevos límites.</span></h1>
-      <p>Un ecosistema basado en Linux diseñado desde cero por programadores y gamers. Optimizado para alto rendimiento, máxima seguridad y personalización hiperespacial. Sin telemetría, sin restricciones.</p>
+      <div class="badge">🚀 El Futuro del Rendimiento</div>
+      <h1>Desata el <span class="highlight">Poder</span> de tu Hardware</h1>
+      <p>Nebula OS redefine la experiencia de usuario combinando un rendimiento extremo para gamers y herramientas nativas para desarrolladores. Sin telemetría. Privacidad absoluta.</p>
       <div class="hero-buttons">
-        <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="btn-primary"><i class="fa-solid fa-download"></i> Descargar Ahora</a>
-        <a href="exposicion/index.html" class="btn-secondary"><i class="fa-solid fa-play"></i> Ver Presentación</a>
+        <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="btn-primary">Descargar Ahora</a>
+        <a href="docs/index.html" class="btn-secondary">Leer Documentación</a>
       </div>
+    </div>
+    
+    <!-- SPLINE 3D SCENE -->
+    <div class="hero-spline">
+      <spline-viewer url="assets/scene.splinecode" loading-anim-type="spinner-big-dark"></spline-viewer>
     </div>
   </section>
 
