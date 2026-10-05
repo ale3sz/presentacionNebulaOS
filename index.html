@@ -255,55 +255,7 @@
     }
 
     // --- NOVA AI CHAT LOGIC ---
-    const novaOrb = document.getElementById('nova-orb');
-    const novaChat = document.getElementById('nova-chat');
-    const novaInput = document.getElementById('nova-input');
-    const novaSend = document.getElementById('nova-send');
-    const novaBody = document.getElementById('nova-body');
-
-    novaOrb.addEventListener('click', () => {
-      novaChat.classList.toggle('active');
-    });
-
-    const botResponses = [
-      { keys: ['requisitos', 'ram', 'cpu', 'necesito'], res: "Nebula OS pide mínimo un Dual Core a 2 GHz y 4GB de RAM. Pero para gaming fluido te recomiendo un i3/Ryzen 3 con 8GB de RAM y SSD." },
-      { keys: ['seguridad', 'virus', 'antivirus', 'shield'], res: "El sistema cuenta con Nebula Shield integrado en el Kernel: un Antivirus en tiempo real, Firewall, y Sandbox para aplicaciones. Estás 100% blindado." },
-      { keys: ['descargar', 'instalar', 'bajar'], res: "Puedes simular la descarga clickeando el botón 'Descargar Ahora' en la página principal, te llevará al repositorio oficial del sistema." },
-      { keys: ['hola', 'buenas'], res: "¡Hola! Bienvenido al universo Nebula. ¿Quieres saber sobre los requisitos, la seguridad o cómo personalizar el sistema?" },
-      { keys: ['personalizar', 'designer', 'colores'], res: "Con Nebula Designer puedes cambiar colores, niveles de desenfoque (blur), formas de ventanas y activar efectos de Parallax estelares." }
-    ];
-
-    function appendMessage(text, sender) {
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'msg ' + sender;
-      msgDiv.textContent = text;
-      novaBody.appendChild(msgDiv);
-      novaBody.scrollTop = novaBody.scrollHeight;
-    }
-
-    function handleChat() {
-      const text = novaInput.value.trim().toLowerCase();
-      if (!text) return;
-      appendMessage(novaInput.value, 'user');
-      novaInput.value = '';
-      
-      setTimeout(() => {
-        let responded = false;
-        for (let item of botResponses) {
-          if (item.keys.some(key => text.includes(key))) {
-            appendMessage(item.res, 'bot');
-            responded = true;
-            break;
-          }
-        }
-        if (!responded) {
-          appendMessage("Procesando consulta... Como soy una demo de Nova AI, te sugiero preguntar sobre 'requisitos', 'seguridad' o 'personalización'.", 'bot');
-        }
-      }, 600);
-    }
-
-    novaSend.addEventListener('click', handleChat);
-    novaInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleChat(); });
+    // Nova logic replaced by advanced module
 
     // --- THREE.JS GALAXY BACKGROUND ---
     const canvas = document.getElementById('webgl-canvas');
@@ -392,6 +344,159 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
   </script>
+
+  <script>
+    // ==========================================
+    // MOTOR DE AUDIO SINTETIZADO (WEB AUDIO API)
+    // ==========================================
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    const NebulaSound = {
+        playHover: () => {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        },
+        playNovaOpen: () => {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.1);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        },
+        playGlitch: () => {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(50, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
+    };
+
+    // Agregar sonido de hover a botones y cards
+    document.querySelectorAll('.btn-primary, .btn-secondary, .card, .nav-link').forEach(el => {
+        el.addEventListener('mouseenter', NebulaSound.playHover);
+    });
+
+    // ==========================================
+    // NOVA AI - EASTER EGGS Y LOGICA
+    // ==========================================
+    const novaOrb = document.getElementById('nova-orb');
+    const novaChat = document.getElementById('nova-chat');
+    const novaInput = document.getElementById('nova-input');
+    const novaSend = document.getElementById('nova-send');
+    const novaBody = document.getElementById('nova-body');
+
+    novaOrb.addEventListener('click', () => {
+        NebulaSound.playNovaOpen();
+        novaChat.classList.toggle('active');
+        if (novaChat.classList.contains('active')) {
+            novaInput.focus();
+        }
+    });
+
+    function addMessage(text, sender) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('msg', sender);
+        msgDiv.textContent = text;
+        novaBody.appendChild(msgDiv);
+        novaBody.scrollTop = novaBody.scrollHeight;
+    }
+
+    // MATRIX EFFECT
+    function startMatrix() {
+        const canvas = document.createElement('canvas');
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0'; canvas.style.left = '0';
+        canvas.style.width = '100vw'; canvas.style.height = '100vh';
+        canvas.style.zIndex = '9999';
+        canvas.style.pointerEvents = 'none';
+        document.body.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%""'#&_(),.;:?!\|{}<>[]^~';
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = Array.from({length: columns}).fill(1);
+        setInterval(() => {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0f0';
+            ctx.font = fontSize + 'px monospace';
+            drops.forEach((y, i) => {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, y * fontSize);
+                if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }, 33);
+        setTimeout(() => canvas.remove(), 10000); // Stop after 10s
+    }
+
+    // GLITCH EFFECT
+    function triggerGlitch() {
+        document.body.style.animation = 'glitchAnim 0.3s infinite';
+        setTimeout(() => { document.body.style.animation = 'none'; }, 1000);
+    }
+
+    const styleGlitch = document.createElement('style');
+    styleGlitch.innerHTML = @keyframes glitchAnim { 0% { filter: hue-rotate(0deg) invert(0); transform: translate(0); } 20% { filter: hue-rotate(90deg) invert(1); transform: translate(-5px, 5px); } 40% { filter: hue-rotate(0deg) invert(0); transform: translate(5px, -5px); } 60% { filter: hue-rotate(180deg) invert(1); transform: translate(-5px, -5px); } 80% { filter: hue-rotate(0deg) invert(0); transform: translate(5px, 5px); } 100% { filter: hue-rotate(0deg) invert(0); transform: translate(0); } };
+    document.head.appendChild(styleGlitch);
+
+    function processNovaCommand(text) {
+        addMessage(text, 'user');
+        novaInput.value = '';
+        const lowerText = text.toLowerCase().trim();
+        
+        setTimeout(() => {
+            if (lowerText === 'clear') {
+                novaBody.innerHTML = '';
+            } else if (lowerText === 'matrix') {
+                NebulaSound.playGlitch();
+                startMatrix();
+                addMessage('Iniciando protocolo Matrix...', 'bot');
+            } else if (lowerText === 'sudo su') {
+                NebulaSound.playGlitch();
+                triggerGlitch();
+                addMessage('ACCESO CONCEDIDO: MODO ROOT ACTIVADO. Privilegios elevados.', 'bot');
+                document.querySelector('.nova-header span').textContent = 'ROOT SYSTEM';
+                document.querySelector('.nova-header').style.background = 'rgba(255,0,0,0.3)';
+            } else if (lowerText.includes('hola')) {
+                addMessage('¡Hola! Soy Nova AI. ¿En qué te puedo ayudar hoy?', 'bot');
+            } else {
+                addMessage('Interesante. Mis protocolos están en mantenimiento, pero Nebula OS está listo.', 'bot');
+            }
+        }, 500);
+    }
+
+    novaSend.addEventListener('click', () => { if(novaInput.value) processNovaCommand(novaInput.value); });
+    novaInput.addEventListener('keypress', (e) => { if(e.key === 'Enter' && novaInput.value) processNovaCommand(novaInput.value); });
+  </script>
+
 </body>
 </html>
 
