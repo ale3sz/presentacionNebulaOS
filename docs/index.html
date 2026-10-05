@@ -4,22 +4,20 @@
   <meta charset="utf-8">
   <title>Documentación | NebulaOS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@0500;700&family=Inter:wght@0300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="icon" type="image/png" href="../assets/nebulaLogo.png">
+  <link rel="icon" type="image/png" href="../assets/novaLogo.png">
   <style>
     :root { --bg-dark: transparent; --sidebar: #0a0e17; --accent: #00ffcc; --text-main: #e2e8f0; --text-sub: #94a3b8; --accent-purple: #9d4edd; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
     
-    /* FONDO ESTELAR CSS ANIMADO PARA DOCS */
     @keyframes move-twink-back { from {background-position:0 0;} to {background-position:-10000px 5000px;} }
     .stars, .twinkling { position:fixed; top:0; left:0; width:100vw; height:100vh; display:block; z-index:-2; pointer-events:none; }
     .stars { background: #020307 url(https://raw.githubusercontent.com/front-end-space/space-background-css/master/images/stars.png) repeat top center; z-index:-3; }
     .twinkling { background:transparent url(https://raw.githubusercontent.com/front-end-space/space-background-css/master/images/twinkling.png) repeat top center; z-index:-2; animation:move-twink-back 200s linear infinite; opacity: 0.3; }
 
-    /* NAVBAR */
-    .navbar { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(5, 7, 14, 0.95); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 5%; ze�ndex: 1000; }
+    .navbar { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(5, 7, 14, 0.95); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 5%; z-index: 1000; }
     .navbar-brand { color: #fff; font-size: 1.5em; font-weight: 700; text-decoration: none; font-family: 'Space Grotesk', sans-serif; }
     .navbar-brand span { color: var(--accent); }
     .nav-links { display: flex; gap: 30px; align-items: center; }
@@ -27,17 +25,14 @@
     .nav-link:hover { color: var(--accent); }
     .nav-btn { background: rgba(0, 255, 204, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; }
 
-    /* LAYOUT DOCS */
     .docs-container { display: flex; margin-top: 70px; flex: 1; }
     
-    /* SIDEBAR MEJORADA */
     .sidebar { width: 280px; background: rgba(10, 14, 22, 0.7); backdrop-filter: blur(15px); border-right: 1px solid rgba(0,255,204,0.1); padding: 30px 20px; position: fixed; height: calc(100vh - 70px); overflow-y: auto; display: flex; flex-direction: column; }
     .sidebar h3 { font-family: 'Space Grotesk', sans-serif; color: #fff; margin-bottom: 20px; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; }
     .sidebar a { display: block; color: var(--text-sub); text-decoration: none; padding: 10px 15px; border-radius: 6px; margin-bottom: 5px; transition: 0.2s; }
     .sidebar a:hover { background: rgba(0,255,204,0.1); color: var(--accent); }
     .sidebar a.active { background: linear-gradient(90deg, rgba(0,255,204,0.15), transparent); border-left: 3px solid var(--accent); color: var(--accent); text-shadow: 0 0 10px rgba(0,255,204,0.5); }
 
-    /* CONTENT MEJORADO */
     .content-wrapper { margin-left: 280px; display: flex; flex-direction: column; flex: 1; }
     .content { padding: 50px 8%; max-width: 1000px; line-height: 1.7; flex: 1; }
     .content h1 { font-family: 'Space Grotesk', sans-serif; font-size: 3em; margin-bottom: 20px; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
@@ -47,13 +42,12 @@
     .content li { margin-bottom: 10px; color: var(--text-sub); }
     .content .alert { background: rgba(157, 78, 221, 0.05); border-left: 4px solid var(--accent-purple); padding: 20px; border-radius: 0 8px 8px 0; margin: 30px 0; box-shadow: 0 0 20px rgba(157, 78, 221, 0.1); backdrop-filter: blur(10px); }
 
-    /* FOOTER DERECHOS DE AUTOR */
     .footer { text-align: center; padding: 25px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-sub); font-size: 0.9em; background: rgba(5,7,14,0.6); backdrop-filter: blur(10px); margin-top: auto; }
   </style>
 </head>
 <body>
   <div class="stars"></div>
-  <div class:"twinkling"></div>
+  <div class="twinkling"></div>
 
   <nav class="navbar">
     <a href="../index.html" class="navbar-brand">NEBULA<span>OS</span></a>
@@ -61,17 +55,17 @@
       <a href="../index.html" class="nav-link">Inicio</a>
       <a href="index.html" class="nav-link" style="color: var(--accent);">Documentación</a>
       <a href="../manual/index.html" class="nav-link">Manual Interactivo</a>
-      <a href="../exposicion/index.html" class="nav-link">Exposicil3n 3D</a>
+      <a href="../exposicion/index.html" class="nav-link">Exposición 3D</a>
       <a href="https://fabrigrotta.github.io/nebulaOS/" target="_blank" class="nav-btn"><i class="fa-solid fa-download"></i> Descargar OS</a>
     </div>
   </nav>
 
   <div class="docs-container">
-    <div class;"sidebar">
-      <div style="text-align: center; margin-bottom: 20px;"><img src="../assets/nebulaLogo.png" alt="Logo" style="width: 80px; filter: drop-shadow(0 0 10px rgba(0,255,204,0.3));"></div>
+    <div class="sidebar">
+      <div style="text-align: center; margin-bottom: 20px;"><img src="../assets/novaLogo.png" alt="Logo" style="width: 80px; filter: drop-shadow(0 0 10px rgba(0,255,204,0.3));"></div>
       <h3>Contenido</h3>
-      <a href="#introduccion" class="active">Introducción y Filosofia</a>
-      <a href="#introduccion">Requisitos del Sistema</a>
+      <a href="#introduccion" class="active">Introducción y Filosofía</a>
+      <a href="#requisitos">Requisitos del Sistema</a>
       <a href="#instalacion">Proceso de Instalación</a>
       <a href="#seguridad">Enfoque de Seguridad</a>
       <a href="#licencia">Licencias y Legalidad</a>
@@ -80,7 +74,7 @@
     <div class="content-wrapper">
       <div class="content">
         <h1 id="introduccion">Documentación Oficial</h1>
-        <p>Bienvenido a la documentación oficial de Nebula OS. Aquí encontraqás toda la información tesíca y técnica del sistema.</p>
+        <p>Bienvenido a la documentación oficial de Nebula OS. Aquí encontrarás toda la información teórica y técnica del sistema.</p>
 
         <div class="alert">
           <strong>Nota del Equipo:</strong> NebulaOS fue diseñado desde cero pensando en el usuario moderno: desarrolladores y gamers que necesitan exprimir al máximo su hardware sin lidiar con procesos ocultos o falta de privacidad.
@@ -118,7 +112,6 @@
         </ul>
       </div>
 
-      <!-- FOOTER EN DOCS -->
       <footer class="footer">
         &copy; 2026 Nebula OS. Todos los derechos reservados. Creado por Fabricio Grottasanta, Alejandro Saenz y equipo.
       </footer>
@@ -126,8 +119,7 @@
   </div>
 
   <script>
-    /* Scrollspy arreglado */
-    const sections = document.querySelectorAll("h2, h1")<
+    const sections = document.querySelectorAll("h2, h1");
     const navLinks = document.querySelectorAll(".sidebar a");
     
     window.addEventListener("scroll", () => {
@@ -140,7 +132,6 @@
         }
       });
 
-      // Si llegó exactamente al final de la página
       if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 20) {
         current = sections[sections.length - 1].getAttribute("id");
       }
