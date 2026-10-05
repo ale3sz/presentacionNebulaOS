@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whitepaper - Nebula OS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos de visualización en pantalla (simulando un lector de PDF) */
+        body {
+            background-color: #323639;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+        }
+
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            color: black;
+            padding: 25mm 20mm;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        /* Tipografía Académica */
+        h1 { text-align: center; font-size: 24px; text-transform: uppercase; margin-bottom: 5px; }
+        .authors { text-align: center; font-size: 14px; font-style: italic; margin-bottom: 20px; color: #333; }
+        .abstract { font-size: 13px; font-weight: bold; text-align: justify; margin: 0 30px 30px 30px; }
+        
+        .content {
+            column-count: 2;
+            column-gap: 15mm;
+            text-align: justify;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        h2 { font-size: 15px; text-transform: uppercase; border-bottom: 1px solid black; padding-bottom: 3px; margin-top: 15px; break-after: avoid; }
+        h3 { font-size: 13px; font-style: italic; margin-top: 10px; break-after: avoid; }
+        p { margin-bottom: 10px; text-indent: 15px; }
+        ul { margin-bottom: 10px; padding-left: 20px; }
+        li { margin-bottom: 5px; }
+
+        /* Botón Flotante para imprimir/guardar */
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #00ffcc;
+            color: #020307;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,255,204,0.4);
+            transition: 0.3s;
+            z-index: 1000;
+        }
+        .print-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,255,204,0.6);
+        }
+
+        /* Ocultar elementos innecesarios al imprimir */
+        @media print {
+            body { background: white; padding: 0; display: block; }
+            .a4-page { width: auto; min-height: auto; box-shadow: none; padding: 0; }
+            .print-btn { display: none; }
+            @page { size: A4; margin: 20mm; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Guardar como PDF</button>
+
+    <div class="a4-page">
+        <h1>Nebula OS: Ecosistema Operativo de Alto Rendimiento Enfocado en Privacidad y Gaming</h1>
+        <div class="authors">Fabricio Grottasanta, Alejandro Saenz y Equipo de Desarrollo</div>
+        
+        <div class="abstract">
+            <strong>Resumen—</strong> En el presente documento técnico se detalla la arquitectura, filosofía y características técnicas de Nebula OS, un sistema operativo basado en el núcleo de Linux. Diseñado específicamente para ofrecer alto rendimiento en entornos de desarrollo de software y videojuegos, Nebula OS implementa el módulo de seguridad nativo "Nebula Shield" a nivel de kernel y adopta una política estricta de cero telemetría. Se exploran los requisitos de hardware, el proceso de instalación automatizado y el modelo de licenciamiento dual que sostiene el proyecto.
+        </div>
+
+        <div class="content">
+            <h2>I. Introducción y Filosofía</h2>
+            <p>En el panorama actual de los sistemas operativos, los usuarios frecuentemente se ven forzados a elegir entre ecosistemas cerrados que comprometen la privacidad mediante telemetría corporativa, o sistemas abiertos que carecen de la optimización "out-of-the-box" necesaria para el <i>gaming</i> competitivo y el desarrollo ágil.</p>
+            <p>Nebula OS nace como respuesta a este paradigma. Basado en la robustez de Linux, fue diseñado desde cero pensando en el usuario moderno. Nuestra premisa fundamental es que el hardware pertenece al usuario, y por lo tanto, el sistema operativo debe actuar como un facilitador transparente y no como un agente de recolección de datos.</p>
+
+            <h2>II. Requisitos del Sistema y Rendimiento</h2>
+            <p>El sistema ha sido compilado y optimizado para reducir la latencia de entrada (<i>input lag</i>) y maximizar la asignación de recursos a las aplicaciones en primer plano, especialmente mediante el "Modo Juego".</p>
+            <h3>A. Especificaciones Mínimas</h3>
+            <ul>
+                <li>Procesador: Dual Core a 2.0 GHz (Arquitectura x86_64).</li>
+                <li>Memoria RAM: 4 GB.</li>
+                <li>Almacenamiento: 25 GB de espacio libre.</li>
+                <li>Gráficos: GPU compatible con OpenGL 2.1.</li>
+            </ul>
+            <h3>B. Especificaciones Recomendadas</h3>
+            <p>Para aprovechar al máximo las capacidades visuales del <i>Nebula Designer</i> y renderizado 3D:</p>
+            <ul>
+                <li>Procesador: Intel Core i3 / AMD Ryzen 3 o superior.</li>
+                <li>Memoria RAM: 8 GB o superior.</li>
+                <li>Almacenamiento: 50 GB en unidad de estado sólido (SSD).</li>
+                <li>Gráficos: GPU compatible con OpenGL 3.3.</li>
+            </ul>
+
+            <h2>III. Arquitectura de Seguridad: Nebula Shield</h2>
+            <p>La seguridad no se maneja como una aplicación externa, sino como una capa fundamental del núcleo operativo. El módulo <i>Nebula Shield</i> opera en el anillo 0 (Ring 0) del procesador, proporcionando:</p>
+            <ul>
+                <li><strong>Firewall y Antivirus Proactivo:</strong> Bloqueo dinámico de conexiones entrantes no autorizadas y escaneo en tiempo real de firmas maliciosas.</li>
+                <li><strong>VPN Nativa:</strong> Integración a nivel de red para el enrutamiento opcional y cifrado del tráfico, garantizando privacidad en redes públicas.</li>
+                <li><strong>Aislamiento (Sandbox):</strong> Las aplicaciones de código cerrado o de terceros se ejecutan en contenedores aislados. Se requiere permiso explícito del administrador para que estas aplicaciones interactúen con el sistema de archivos del usuario o periféricos de hardware (cámara, micrófono).</li>
+            </ul>
+
+            <h2>IV. Proceso de Instalación</h2>
+            <p>La barrera de entrada a los sistemas basados en Linux tradicionalmente ha sido la complejidad de instalación. Nebula OS integra el instalador gráfico <i>Calamares</i>, el cual simplifica la transición mediante una interfaz intuitiva en pocos pasos:</p>
+            <p>1. Selección de idioma y distribución de teclado.<br>
+               2. Conexión a red para la descarga de parches críticos de Día-1.<br>
+               3. Particionado de disco (con opción de cifrado completo de disco mediante LUKS para máxima seguridad física).<br>
+               4. Creación de credenciales del superusuario.</p>
+
+            <h2>V. Integración de Inteligencia Artificial</h2>
+            <p>Una característica pionera es <i>Nova AI</i>, un asistente de inteligencia artificial integrado profundamente en el sistema. Nova no actúa como un simple motor de búsqueda, sino como un administrador del sistema capaz de ejecutar comandos, diagnosticar problemas de red y asistir en la personalización del entorno visual a través de lenguaje natural.</p>
+
+            <h2>VI. Modelo de Licenciamiento y Legalidad</h2>
+            <p>Para asegurar la sustentabilidad y transparencia del proyecto, Nebula OS emplea un licenciamiento dual:</p>
+            <p><strong>GNU GPL v3:</strong> Aplicado al kernel y al sistema base. Esto garantiza que el código fuente central sea auditable, de libre distribución y asegure que ninguna corporación pueda privatizar las bases del ecosistema.</p>
+            <p><strong>Licencia MIT:</strong> Aplicada a aplicaciones de alto nivel desarrolladas internamente, como <i>Nebula Store</i> y componentes de la interfaz. Esto facilita que desarrolladores externos integren sus tecnologías propietarias (como motores de videojuegos o software corporativo) sin infringir restricciones virales.</p>
+
+            <h2>VII. Conclusión</h2>
+            <p>Nebula OS representa un avance significativo hacia la convergencia entre el rendimiento extremo requerido por entusiastas y la seguridad criptográfica demandada por profesionales. Al eliminar la telemetría y colocar al usuario en control absoluto, se establece un nuevo estándar en el diseño de sistemas operativos de escritorio.</p>
+        </div>
+    </div>
+</body>
+</html>
